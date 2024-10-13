@@ -9,7 +9,7 @@ CREATE TABLE user (
 
 -- Personal Information table
 CREATE TABLE personal_info (
-  personalInfoID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  personal_infoID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   userID INT UNSIGNED NOT NULL,
   firstName VARCHAR(100) NOT NULL,
   lastName VARCHAR(100) NOT NULL,

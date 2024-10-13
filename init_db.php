@@ -6,18 +6,18 @@ $user = 'root'; // MySQL 用户名
 $pass = ''; // MySQL 密码（默认为空）
 
 try {
-    // 创建PDO连接
+    // 创建PDO连接（不连接数据库）
     $pdo = new PDO("mysql:host=$host", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // 创建数据库，如果不存在
+
+    // 检查数据库是否存在，如果不存在则创建数据库
     $pdo->exec("CREATE DATABASE IF NOT EXISTS $db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     echo "Database created or already exists.\n";
 
-    // 选择数据库
+    // 连接到刚刚创建或已存在的数据库
     $pdo->exec("USE $db");
 
-    // 创建 user 表
+    // 检查并创建 user 表
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS user (
             userID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -27,9 +27,9 @@ try {
             registrationDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     ");
-    echo "User table created.\n";
+    echo "User table created or already exists.\n";
 
-    // 创建 personalInfo 表
+    // 检查并创建 personal_info 表
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS personal_info (
             personalInfoID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -47,18 +47,18 @@ try {
             FOREIGN KEY (userID) REFERENCES user(userID) ON DELETE CASCADE
         )
     ");
-    echo "PersonalInfo table created.\n";
+    echo "Personal_info table created or already exists.\n";
 
-    // 创建 category 表
+    // 检查并创建 category 表
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS category (
             categoryID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             categoryName VARCHAR(100) NOT NULL UNIQUE
         )
     ");
-    echo "Category table created.\n";
+    echo "Category table created or already exists.\n";
 
-    // 创建 item 表
+    // 检查并创建 item 表
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS item (
             itemID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -80,9 +80,9 @@ try {
             CONSTRAINT check_dates CHECK (endDate > startDate)
         )
     ");
-    echo "Item table created.\n";
+    echo "Item table created or already exists.\n";
 
-    // 创建 bid 表
+    // 检查并创建 bid 表
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS bid (
             bidID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -94,9 +94,9 @@ try {
             FOREIGN KEY (userID) REFERENCES user(userID)
         )
     ");
-    echo "Bid table created.\n";
+    echo "Bid table created or already exists.\n";
 
-    // 创建 auction_transaction 表
+    // 检查并创建 auction_transaction 表
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS auction_transaction (
             transactionID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -108,9 +108,9 @@ try {
             FOREIGN KEY (buyerID) REFERENCES user(userID)
         )
     ");
-    echo "Auction transaction table created.\n";
+    echo "Auction transaction table created or already exists.\n";
 
-    // 插入样例数据到 category 表
+    // 插入样例数据到 category 表，使用 INSERT IGNORE 避免重复插入
     $pdo->exec("
         INSERT IGNORE INTO category (categoryName) VALUES 
         ('Electronics'),
@@ -121,7 +121,7 @@ try {
         ('Motors'),
         ('Toys & Hobbies')
     ");
-    echo "Sample categories inserted.\n";
+    echo "Sample categories inserted or already exist.\n";
 
 } catch (PDOException $e) {
     // 输出错误信息
