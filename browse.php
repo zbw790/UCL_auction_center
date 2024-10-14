@@ -1,198 +1,329 @@
-<?php include_once("header.php")?>
-<?php require("utilities.php")?>
+<?php
+session_start();
+if (!isset($_SESSION['logged_in'])) {
+    $_SESSION['logged_in'] = false;
+    $_SESSION['account_type'] = 'guest'; 
+}
+?>
 
-<div class="container">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- Bootstrap 5 和 FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-<h2 class="my-3">Browse listings</h2>
+  <!-- AOS CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
 
-<div id="searchSpecs">
-<!-- When this form is submitted, this PHP page is what processes it.
-     Search/sort specs are passed to this page through parameters in the URL
-     (GET method of passing data to a page). -->
-<form method="get" action="browse.php">
-  <div class="row">
-    <div class="col-md-5 pr-0">
-      <div class="form-group">
-        <label for="keyword" class="sr-only">Search keyword:</label>
-	    <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text bg-transparent pr-0 text-muted">
-              <i class="fa fa-search"></i>
-            </span>
+  <!-- 自定义CSS -->
+  <link rel="stylesheet" href="css/custom.css">
+
+  <title>Browse Auctions - My Auction Site</title>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#">My Auction Site</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="browse.php">Browse</a>
+        </li>
+        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="mybids.php">My Bids</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="recommendations.php">Recommended</a>
+          </li>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="mylistings.php">My Listings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="create_auction.php">Create Auction</a>
+          </li>
+        <?php endif; ?>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
+            <a class="nav-link" href="logout.php">Logout</a>
+          <?php else: ?>
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+          <?php endif; ?>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="login_result.php">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
           </div>
-          <input type="text" class="form-control border-left-0" id="keyword" placeholder="Search for anything">
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Sign in</button>
+        </form>
+        <div class="mt-3">
+          <p>Don't have an account? <a href="register.php">Register here</a></p>
         </div>
       </div>
     </div>
-    <div class="col-md-3 pr-0">
-      <div class="form-group">
-        <label for="cat" class="sr-only">Search within:</label>
-        <select class="form-control" id="cat">
-          <option selected value="all">All categories</option>
-          <option value="fill">Fill me in</option>
-          <option value="with">with options</option>
-          <option value="populated">populated from a database?</option>
-        </select>
+  </div>
+</div>
+
+<div class="container-fluid p-0">
+  <div class="jumbotron bg-primary text-white text-center py-5 mb-4">
+    <h1 class="display-4">Discover Amazing Auctions</h1>
+    <p class="lead">Find unique items and great deals!</p>
+  </div>
+
+  <div class="container">
+    <h2 class="my-4">Browse Listings</h2>
+
+    <?php if (isset($_SESSION['message'])): ?>
+      <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
+        <?php echo $_SESSION['message']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
+      <?php
+      unset($_SESSION['message']);
+      unset($_SESSION['message_type']);
+      ?>
+    <?php endif; ?>
+
+    <div id="searchSpecs" class="bg-light p-4 rounded shadow-sm mb-4">
+      <form method="get" action="browse.php">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <i class="fa fa-search"></i>
+              </span>
+              <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Search for anything">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="cat" name="cat">
+              <option selected value="all">All categories</option>
+              <option value="electronics">Electronics</option>
+              <option value="fashion">Fashion</option>
+              <option value="home">Home & Garden</option>
+              <option value="sports">Sports</option>
+              <option value="toys">Toys & Hobbies</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <label class="input-group-text" for="order_by">Sort by:</label>
+              <select class="form-select" id="order_by" name="order_by">
+                <option selected value="pricelow">Price (low to high)</option>
+                <option value="pricehigh">Price (high to low)</option>
+                <option value="date">Soonest expiry</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+          </div>
+        </div>
+      </form>
     </div>
-    <div class="col-md-3 pr-0">
-      <div class="form-inline">
-        <label class="mx-2" for="order_by">Sort by:</label>
-        <select class="form-control" id="order_by">
-          <option selected value="pricelow">Price (low to high)</option>
-          <option value="pricehigh">Price (high to low)</option>
-          <option value="date">Soonest expiry</option>
-        </select>
+
+    <?php
+    // Retrieve these from the URL
+    if (!isset($_GET['keyword'])) {
+      $keyword = "";
+    } else {
+      $keyword = $_GET['keyword'];
+    }
+
+    if (!isset($_GET['cat'])) {
+      $category = "all";
+    } else {
+      $category = $_GET['cat'];
+    }
+    
+    if (!isset($_GET['order_by'])) {
+      $ordering = "pricelow";
+    } else {
+      $ordering = $_GET['order_by'];
+    }
+    
+    if (!isset($_GET['page'])) {
+      $curr_page = 1;
+    } else {
+      $curr_page = $_GET['page'];
+    }
+
+    /* TODO: Use above values to construct a query. Use this query to 
+       retrieve data from the database. (If there is no form data entered,
+       decide on appropriate default value/default query to make. */
+    
+    /* For the purposes of pagination, it would also be helpful to know the
+       total number of results that satisfy the above query */
+    $num_results = 96; // TODO: Calculate me for real
+    $results_per_page = 10;
+    $max_page = ceil($num_results / $results_per_page);
+    ?>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+      <?php
+      // Replace this with your actual data retrieval logic
+      for ($i = 0; $i < 6; $i++) {
+        $item_id = "item_" . $i;
+        $title = "Auction Item " . ($i + 1);
+        $description = "This is a sample description for auction item " . ($i + 1) . ". It's a great product!";
+        $current_price = rand(10, 1000);
+        $num_bids = rand(0, 20);
+        $end_date = new DateTime(date('Y-m-d H:i:s', strtotime('+' . rand(1, 30) . ' days')));
+        
+        echo '<div class="col" data-aos="fade-up">';
+        echo '<div class="card h-100 shadow-sm">';
+        echo '<div class="card-body">';
+        echo '<h5 class="card-title">' . $title . '</h5>';
+        echo '<p class="card-text">' . substr($description, 0, 100) . '...</p>';
+        echo '<p class="card-text"><strong>Current Price:</strong> $' . number_format($current_price, 2) . '</p>';
+        echo '<p class="card-text"><strong>Bids:</strong> ' . $num_bids . '</p>';
+        echo '<p class="card-text"><strong>Ends:</strong> ' . $end_date->format('Y-m-d H:i:s') . '</p>';
+        echo '</div>';
+        echo '<div class="card-footer">';
+        echo '<a href="listing.php?item_id=' . $item_id . '" class="btn btn-primary">View Auction</a>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+      }
+      ?>
+    </div>
+
+    <nav aria-label="Search results pages" class="my-4">
+      <ul class="pagination justify-content-center">
+        <?php
+        // Copy any currently-set GET variables to the URL.
+        $querystring = "";
+        foreach ($_GET as $key => $value) {
+          if ($key != "page") {
+            $querystring .= "$key=$value&amp;";
+          }
+        }
+        
+        $high_page_boost = max(3 - $curr_page, 0);
+        $low_page_boost = max(2 - ($max_page - $curr_page), 0);
+        $low_page = max(1, $curr_page - 2 - $low_page_boost);
+        $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
+        
+        if ($curr_page != 1) {
+          echo('
+          <li class="page-item">
+            <a class="page-link" href="browse.php?' . $querystring . 'page=' . ($curr_page - 1) . '" aria-label="Previous">
+              <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
+              <span class="sr-only">Previous</span>
+            </a>
+          </li>');
+        }
+          
+        for ($i = $low_page; $i <= $high_page; $i++) {
+          if ($i == $curr_page) {
+            // Highlight the link
+            echo('
+          <li class="page-item active">');
+          }
+          else {
+            // Non-highlighted link
+            echo('
+          <li class="page-item">');
+          }
+          
+          // Do this in any case
+          echo('
+            <a class="page-link" href="browse.php?' . $querystring . 'page=' . $i . '">' . $i . '</a>
+          </li>');
+        }
+        
+        if ($curr_page != $max_page) {
+          echo('
+          <li class="page-item">
+            <a class="page-link" href="browse.php?' . $querystring . 'page=' . ($curr_page + 1) . '" aria-label="Next">
+              <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </li>');
+        }
+        ?>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-light text-center text-lg-start mt-4">
+  <div class="container p-4">
+    <div class="row">
+      <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+        <h5 class="text-uppercase">About Us</h5>
+        <p>
+          We are a leading online auction platform, connecting buyers and sellers from around the world.
+        </p>
       </div>
-    </div>
-    <div class="col-md-1 px-0">
-      <button type="submit" class="btn btn-primary">Search</button>
+      <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+        <h5 class="text-uppercase">Links</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="#!" class="text-dark">FAQ</a></li>
+          <li><a href="#!" class="text-dark">Contact Us</a></li>
+          <li><a href="#!" class="text-dark">Terms of Service</a></li>
+          <li><a href="#!" class="text-dark">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+        <h5 class="text-uppercase">Follow Us</h5>
+        <ul class="list-unstyled">
+          <li><a href="#!" class="text-dark"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+          <li><a href="#!" class="text-dark"><i class="fab fa-twitter"></i> Twitter</a></li>
+          <li><a href="#!" class="text-dark"><i class="fab fa-instagram"></i> Instagram</a></li>
+        </ul>
+      </div>
     </div>
   </div>
-</form>
-</div> <!-- end search specs bar -->
+  <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+    © 2023 My Auction Site. All rights reserved.
+  </div>
+</footer>
 
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-</div>
+<!-- AOS JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 
-<?php
-  // Retrieve these from the URL
-  if (!isset($_GET['keyword'])) {
-    // TODO: Define behavior if a keyword has not been specified.
-  }
-  else {
-    $keyword = $_GET['keyword'];
-  }
+<script>
+  AOS.init({
+    duration: 800,
+    once: true
+  });
+</script>
 
-  if (!isset($_GET['cat'])) {
-    // TODO: Define behavior if a category has not been specified.
-  }
-  else {
-    $category = $_GET['cat'];
-  }
-  
-  if (!isset($_GET['order_by'])) {
-    // TODO: Define behavior if an order_by value has not been specified.
-  }
-  else {
-    $ordering = $_GET['order_by'];
-  }
-  
-  if (!isset($_GET['page'])) {
-    $curr_page = 1;
-  }
-  else {
-    $curr_page = $_GET['page'];
-  }
-
-  /* TODO: Use above values to construct a query. Use this query to 
-     retrieve data from the database. (If there is no form data entered,
-     decide on appropriate default value/default query to make. */
-  
-  /* For the purposes of pagination, it would also be helpful to know the
-     total number of results that satisfy the above query */
-  $num_results = 96; // TODO: Calculate me for real
-  $results_per_page = 10;
-  $max_page = ceil($num_results / $results_per_page);
-?>
-
-<div class="container mt-5">
-
-<!-- TODO: If result set is empty, print an informative message. Otherwise... -->
-
-<ul class="list-group">
-
-<!-- TODO: Use a while loop to print a list item for each auction listing
-     retrieved from the query -->
-
-<?php
-  // Demonstration of what listings will look like using dummy data.
-  $item_id = "87021";
-  $title = "Dummy title";
-  $description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eget rutrum ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus feugiat, ipsum vel egestas elementum, sem mi vestibulum eros, et facilisis dui nisi eget metus. In non elit felis. Ut lacus sem, pulvinar ultricies pretium sed, viverra ac sapien. Vivamus condimentum aliquam rutrum. Phasellus iaculis faucibus pellentesque. Sed sem urna, maximus vitae cursus id, malesuada nec lectus. Vestibulum scelerisque vulputate elit ut laoreet. Praesent vitae orci sed metus varius posuere sagittis non mi.";
-  $current_price = 30;
-  $num_bids = 1;
-  $end_date = new DateTime('2020-09-16T11:00:00');
-  
-  // This uses a function defined in utilities.php
-  print_listing_li($item_id, $title, $description, $current_price, $num_bids, $end_date);
-  
-  $item_id = "516";
-  $title = "Different title";
-  $description = "Very short description.";
-  $current_price = 13.50;
-  $num_bids = 3;
-  $end_date = new DateTime('2020-11-02T00:00:00');
-  
-  print_listing_li($item_id, $title, $description, $current_price, $num_bids, $end_date);
-?>
-
-</ul>
-
-<!-- Pagination for results listings -->
-<nav aria-label="Search results pages" class="mt-5">
-  <ul class="pagination justify-content-center">
-  
-<?php
-
-  // Copy any currently-set GET variables to the URL.
-  $querystring = "";
-  foreach ($_GET as $key => $value) {
-    if ($key != "page") {
-      $querystring .= "$key=$value&amp;";
-    }
-  }
-  
-  $high_page_boost = max(3 - $curr_page, 0);
-  $low_page_boost = max(2 - ($max_page - $curr_page), 0);
-  $low_page = max(1, $curr_page - 2 - $low_page_boost);
-  $high_page = min($max_page, $curr_page + 2 + $high_page_boost);
-  
-  if ($curr_page != 1) {
-    echo('
-    <li class="page-item">
-      <a class="page-link" href="browse.php?' . $querystring . 'page=' . ($curr_page - 1) . '" aria-label="Previous">
-        <span aria-hidden="true"><i class="fa fa-arrow-left"></i></span>
-        <span class="sr-only">Previous</span>
-      </a>
-    </li>');
-  }
-    
-  for ($i = $low_page; $i <= $high_page; $i++) {
-    if ($i == $curr_page) {
-      // Highlight the link
-      echo('
-    <li class="page-item active">');
-    }
-    else {
-      // Non-highlighted link
-      echo('
-    <li class="page-item">');
-    }
-    
-    // Do this in any case
-    echo('
-      <a class="page-link" href="browse.php?' . $querystring . 'page=' . $i . '">' . $i . '</a>
-    </li>');
-  }
-  
-  if ($curr_page != $max_page) {
-    echo('
-    <li class="page-item">
-      <a class="page-link" href="browse.php?' . $querystring . 'page=' . ($curr_page + 1) . '" aria-label="Next">
-        <span aria-hidden="true"><i class="fa fa-arrow-right"></i></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </li>');
-  }
-?>
-
-  </ul>
-</nav>
-
-
-</div>
-
-
-
-<?php include_once("footer.php")?>
+</body>
+</html>
