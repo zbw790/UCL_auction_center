@@ -139,20 +139,26 @@
           <div class="col-md-3">
             <select class="form-select" id="cat" name="cat">
               <option selected value="all">All categories</option>
-              <option value="electronics">Electronics</option>
-              <option value="fashion">Fashion</option>
-              <option value="home">Home & Garden</option>
-              <option value="sports">Sports</option>
-              <option value="toys">Toys & Hobbies</option>
+              <?php
+              $stmt = $pdo->prepare("SELECT category_id, category_name FROM category ORDER BY category_name");
+              $stmt->execute();
+              $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+              foreach ($categories as $category) {
+                echo '<option value="' . htmlspecialchars($category['category_id']) . '">' .
+                htmlspecialchars($category['category_name']) . '</option>';
+              }
+              ?>
             </select>
           </div>
           <div class="col-md-3">
             <div class="input-group">
               <label class="input-group-text" for="order_by">Sort by:</label>
               <select class="form-select" id="order_by" name="order_by">
-                <option selected value="pricelow">Price (low to high)</option>
-                <option value="pricehigh">Price (high to low)</option>
-                <option value="date">Soonest expiry</option>
+                <option selected value="price_low">Price (low to high)</option>
+                <option value="price_high">Price (high to low)</option>
+                <option value="date_asc">Expiry (soonest first)</option>
+                <option value="date_desc">Expiry (latest first)</option>
               </select>
             </div>
           </div>
@@ -178,7 +184,7 @@
     }
     
     if (!isset($_GET['order_by'])) {
-      $ordering = "pricelow";
+      $ordering = "price_low";
     } else {
       $ordering = $_GET['order_by'];
     }
@@ -189,59 +195,102 @@
       $curr_page = $_GET['page'];
     }
 
-    /* TODO: Use above values to construct a query. Use this query to 
-       retrieve data from the database. (If there is no form data entered,
-       decide on appropriate default value/default query to make. */
+
+    $results_per_page = 6;
+    $offset = ($curr_page - 1) * $results_per_page;
+
+    $params = array();
+
+    $base_query = "FROM item i
+                    LEFT JOIN bid b ON i.item_id = b.item_id
+                    WHERE i.status = 'active'";
+
+    if(!empty($keyword)) {
+      $base_query .= " AND (i.item_name LIKE :keyword OR i.description LIKE :keyword)";
+      $params[":keyword"] = '%' . $keyword . '%';
+    }
+    if($category != "all") {
+      $base_query .= "AND i.category_id = :category_id";
+      $params[":category_id"] = $category;
+    }
+
+    $group_query = " GROUP BY i.item_id";
+
+    switch ($ordering) {
+      case 'price_low':
+        $order = "ORDER BY COALESCE(MAX(b.bid_amount), i.starting_price) ASC";
+        break;
+      case 'price_high':
+        $order = "ORDER BY COALESCE(MAX(b.bid_amount), i.starting_price) DESC";
+        break;
+      case 'date_asc':
+        $order = "ORDER BY i.end_date ASC";
+        break;
+      case 'date_desc':
+        $order = "ORDER BY i.end_date DESC";
+        break;
+      default:
+        $order = "ORDER BY i.end_date ASC";
+    }
+
+    $full_query = "SELECT i.item_id, i.item_name, i.description, COALESCE(MAX(b.bid_amount), i.starting_price) AS current_price, COUNT(b.bid_id) AS num_bids, i.end_date
+                    $base_query
+                    $group_query
+                    $order
+                    LIMIT :offset, :limit";
     
-    /* For the purposes of pagination, it would also be helpful to know the
-       total number of results that satisfy the above query */
-    $num_results = 96; // TODO: Calculate me for real
-    $results_per_page = 10;
+    $stmt = $pdo->prepare($full_query);
+
+    if (!empty($params)) {
+      foreach ($params as $key => $value) {
+          $stmt->bindValue($key, $value);
+      }
+    }
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', $results_per_page, PDO::PARAM_INT);
+
+    $stmt->execute();
+    $auctions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $count_query = "SELECT COUNT(DISTINCT i.item_id) AS total
+                    $base_query";
+    $stmt = $pdo->prepare($count_query);
+
+    if (!empty($params)) {
+      foreach ($params as $key => $value) {
+          $stmt->bindValue($key, $value);
+      }
+    }
+    
+    $stmt->execute();
+    $num_results = $stmt->fetchColumn();
     $max_page = ceil($num_results / $results_per_page);
     ?>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
-      <?php
-      $stmt = $pdo->prepare("SELECT i.itemID, i.itemName, i.description, COALESCE(MAX(b.bidAmount), i.startingPrice) AS current_price, COUNT(b.bidID) AS num_bids
-                              FROM item i
-                              LEFT JOIN bid b ON i.itemID = b.itemID
-                              WHERE i.status = 'active'
-                              GROUP BY i.itemID
-                              ORDER BY i.endDate ASC");
-      $stmt->execute();
-      $auctions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      foreach ($auctions as $auction) {
-          $item_id = $auction['itemID'];
-          $title = htmlspecialchars($auction['itemName']);
-          $description = htmlspecialchars($auction['description']);
-          $current_price = $auction['current_price']; // Make sure this matches your SQL alias
-          $num_bids = $auction['num_bids']; // Make sure this matches your SQL alias
-          $end_date = new DateTime($auction['endDate']);
-          
-          echo '<div class="col" data-aos="fade-up">';
-          echo '<a href="listing.php?item_id=' . $item_id . '" class="text-decoration-none">';
-          echo '<div class="card h-100 shadow-sm hover-effect">';
-          echo '<div class="card-body">';
-          echo '<h5 class="card-title text-primary">' . $title . '</h5>';
-          echo '<p class="card-text text-muted">' . substr($description, 0, 100) . '...</p>';
-          echo '<p class="card-text"><strong>Current Price:</strong> $' . number_format($current_price, 2) . '</p>';
-          echo '<p class="card-text"><strong>Bids:</strong> ' . $num_bids . '</p>';
-          echo '<p class="card-text"><strong>Ends:</strong> ' . $end_date->format('Y-m-d H:i:s') . '</p>';
-          echo '</div>';
-          echo '</div>';
-          echo '</a>';
-          echo '</div>';
-      }
-
-      // If there are no active auctions, display a message
-      if (empty($auctions)) {
-          echo '<div class="col-12 text-center">';
-          echo '<p class="lead">No active auctions at the moment. Check back later!</p>';
-          echo '</div>';
-      }
-      ?>
+      <?php if (empty($auctions)): ?>
+          <div class="col-12 text-center">
+              <p class="lead">No active auctions match your search. Try different criteria!</p>
+          </div>
+      <?php else: ?>
+          <?php foreach ($auctions as $auction): ?>
+              <div class="col" data-aos="fade-up">
+                  <a href="listing.php?item_id=<?php echo $auction['item_id']; ?>" class="text-decoration-none">
+                      <div class="card h-100 shadow-sm hover-effect">
+                          <div class="card-body">
+                              <h5 class="card-title text-primary"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
+                              <p class="card-text text-muted"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
+                              <p class="card-text"><strong>Current Price:</strong> $<?php echo number_format($auction['current_price'], 2); ?></p>
+                              <p class="card-text"><strong>Bids:</strong> <?php echo $auction['num_bids']; ?></p>
+                              <p class="card-text"><strong>Ends:</strong> <?php echo (new DateTime($auction['end_date']))->format('Y-m-d H:i:s'); ?></p>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+          <?php endforeach; ?>
+      <?php endif; ?>
   </div>
+  
 
     <nav aria-label="Search results pages" class="my-4">
       <ul class="pagination justify-content-center">
