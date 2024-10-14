@@ -1,7 +1,8 @@
-<?php include_once("header.php")?>
+<?php
+include_once("header.php");
+?>
 
 <div class="container-fluid p-0">
-  <!-- 添加吸引人的头部横幅 -->
   <div class="jumbotron bg-primary text-white text-center py-5 mb-4">
     <h1 class="display-4">Join Our Auction Community</h1>
     <p class="lead">Register now to start bidding and selling!</p>
@@ -10,7 +11,17 @@
   <div class="container">
     <h2 class="my-4">Register New Account</h2>
 
-    <!-- 注册表单 -->
+    <?php
+    if (isset($_SESSION['message'])) {
+        echo '<div class="alert alert-' . $_SESSION['message_type'] . ' alert-dismissible fade show" role="alert">
+                ' . $_SESSION['message'] . '
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>';
+        unset($_SESSION['message']);
+        unset($_SESSION['message_type']);
+    }
+    ?>
+
     <div class="bg-light p-4 rounded shadow-sm mb-4">
       <form method="POST" action="process_registration.php">
         <div class="mb-3 row">

@@ -55,15 +55,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['user_id'] = $userId;
     $_SESSION['username'] = $username;
     
-    // You might want to set a default account type, e.g., 'buyer'
-    $_SESSION['account_type'] = 'buyer';
-
     $_SESSION['message'] = "Registration successful! You are now logged in.";
     $_SESSION['message_type'] = "success";
     
     header("Location: browse.php");
     exit();
 } else {
-    echo "Invalid request method.";
+    $_SESSION['message'] = "Invalid request method.";
+    $_SESSION['message_type'] = "danger";
+    header("Location: register.php");
+    exit();
 }
 ?>
