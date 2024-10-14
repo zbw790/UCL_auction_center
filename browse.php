@@ -1,10 +1,4 @@
-<?php
-session_start();
-if (!isset($_SESSION['logged_in'])) {
-    $_SESSION['logged_in'] = false;
-    $_SESSION['account_type'] = 'guest'; 
-}
-?>
+<?php require_once 'init.php'; ?>
 
 <!doctype html>
 <html lang="en">
@@ -206,34 +200,48 @@ if (!isset($_SESSION['logged_in'])) {
     $max_page = ceil($num_results / $results_per_page);
     ?>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
       <?php
-      // Replace this with your actual data retrieval logic
-      for ($i = 0; $i < 6; $i++) {
-        $item_id = "item_" . $i;
-        $title = "Auction Item " . ($i + 1);
-        $description = "This is a sample description for auction item " . ($i + 1) . ". It's a great product!";
-        $current_price = rand(10, 1000);
-        $num_bids = rand(0, 20);
-        $end_date = new DateTime(date('Y-m-d H:i:s', strtotime('+' . rand(1, 30) . ' days')));
-        
-        echo '<div class="col" data-aos="fade-up">';
-        echo '<div class="card h-100 shadow-sm">';
-        echo '<div class="card-body">';
-        echo '<h5 class="card-title">' . $title . '</h5>';
-        echo '<p class="card-text">' . substr($description, 0, 100) . '...</p>';
-        echo '<p class="card-text"><strong>Current Price:</strong> $' . number_format($current_price, 2) . '</p>';
-        echo '<p class="card-text"><strong>Bids:</strong> ' . $num_bids . '</p>';
-        echo '<p class="card-text"><strong>Ends:</strong> ' . $end_date->format('Y-m-d H:i:s') . '</p>';
-        echo '</div>';
-        echo '<div class="card-footer">';
-        echo '<a href="listing.php?item_id=' . $item_id . '" class="btn btn-primary">View Auction</a>';
-        echo '</div>';
-        echo '</div>';
-        echo '</div>';
+      $stmt = $pdo->prepare("SELECT i.itemID, i.itemName, i.description, COALESCE(MAX(b.bidAmount), i.startingPrice) AS current_price, COUNT(b.bidID) AS num_bids
+                              FROM item i
+                              LEFT JOIN bid b ON i.itemID = b.itemID
+                              WHERE i.status = 'active'
+                              GROUP BY i.itemID
+                              ORDER BY i.endDate ASC");
+      $stmt->execute();
+      $auctions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($auctions as $auction) {
+          $item_id = $auction['itemID'];
+          $title = htmlspecialchars($auction['itemName']);
+          $description = htmlspecialchars($auction['description']);
+          $current_price = $auction['current_price']; // Make sure this matches your SQL alias
+          $num_bids = $auction['num_bids']; // Make sure this matches your SQL alias
+          $end_date = new DateTime($auction['endDate']);
+          
+          echo '<div class="col" data-aos="fade-up">';
+          echo '<a href="listing.php?item_id=' . $item_id . '" class="text-decoration-none">';
+          echo '<div class="card h-100 shadow-sm hover-effect">';
+          echo '<div class="card-body">';
+          echo '<h5 class="card-title text-primary">' . $title . '</h5>';
+          echo '<p class="card-text text-muted">' . substr($description, 0, 100) . '...</p>';
+          echo '<p class="card-text"><strong>Current Price:</strong> $' . number_format($current_price, 2) . '</p>';
+          echo '<p class="card-text"><strong>Bids:</strong> ' . $num_bids . '</p>';
+          echo '<p class="card-text"><strong>Ends:</strong> ' . $end_date->format('Y-m-d H:i:s') . '</p>';
+          echo '</div>';
+          echo '</div>';
+          echo '</a>';
+          echo '</div>';
+      }
+
+      // If there are no active auctions, display a message
+      if (empty($auctions)) {
+          echo '<div class="col-12 text-center">';
+          echo '<p class="lead">No active auctions at the moment. Check back later!</p>';
+          echo '</div>';
       }
       ?>
-    </div>
+  </div>
 
     <nav aria-label="Search results pages" class="my-4">
       <ul class="pagination justify-content-center">
@@ -301,24 +309,13 @@ if (!isset($_SESSION['logged_in'])) {
       <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
         <h5 class="text-uppercase">About Us</h5>
         <p>
-          UCL is the best!!!!.
+          We are group 40 and UCL is the best!!!!.
         </p>
       </div>
       <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
         <h5 class="text-uppercase">Links</h5>
         <ul class="list-unstyled mb-0">
-          <li><a href="#!" class="text-dark">FAQ</a></li>
           <li><a href="#!" class="text-dark">Contact Us</a></li>
-          <li><a href="#!" class="text-dark">Terms of Service</a></li>
-          <li><a href="#!" class="text-dark">Privacy Policy</a></li>
-        </ul>
-      </div>
-      <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-        <h5 class="text-uppercase">Follow Us</h5>
-        <ul class="list-unstyled">
-          <li><a href="#!" class="text-dark"><i class="fab fa-facebook-f"></i> Facebook</a></li>
-          <li><a href="#!" class="text-dark"><i class="fab fa-twitter"></i> Twitter</a></li>
-          <li><a href="#!" class="text-dark"><i class="fab fa-instagram"></i> Instagram</a></li>
         </ul>
       </div>
     </div>
