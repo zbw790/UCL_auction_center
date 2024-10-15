@@ -196,7 +196,7 @@
     }
 
 
-    $results_per_page = 6;
+    $results_per_page = 9;
     $offset = ($curr_page - 1) * $results_per_page;
 
     $params = array();
@@ -230,7 +230,7 @@
         $order = "ORDER BY i.end_date DESC";
         break;
       default:
-        $order = "ORDER BY i.end_date ASC";
+        $order = "ORDER BY i.item_id ASC";
     }
 
     $full_query = "SELECT i.item_id, i.item_name, i.description, COALESCE(MAX(b.bid_amount), i.starting_price) AS current_price, COUNT(b.bid_id) AS num_bids, i.end_date
@@ -267,29 +267,50 @@
     $max_page = ceil($num_results / $results_per_page);
     ?>
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
-      <?php if (empty($auctions)): ?>
-          <div class="col-12 text-center">
-              <p class="lead">No active auctions match your search. Try different criteria!</p>
-          </div>
-      <?php else: ?>
-          <?php foreach ($auctions as $auction): ?>
-              <div class="col" data-aos="fade-up">
-                  <a href="listing.php?item_id=<?php echo $auction['item_id']; ?>" class="text-decoration-none">
-                      <div class="card h-100 shadow-sm hover-effect">
-                          <div class="card-body">
-                              <h5 class="card-title text-primary"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
-                              <p class="card-text text-muted"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
-                              <p class="card-text"><strong>Current Price:</strong> $<?php echo number_format($auction['current_price'], 2); ?></p>
-                              <p class="card-text"><strong>Bids:</strong> <?php echo $auction['num_bids']; ?></p>
-                              <p class="card-text"><strong>Ends:</strong> <?php echo (new DateTime($auction['end_date']))->format('Y-m-d H:i:s'); ?></p>
-                          </div>
-                      </div>
-                  </a>
+    <?php
+    function getRemainingTime($endDate) {
+        $now = new DateTime();
+        $end = new DateTime($endDate);
+        $interval = $now->diff($end);
+        
+        if ($interval->invert) {
+            return "Ended";
+        }
+        
+        $days = $interval->d;
+        $hours = $interval->h;
+        
+        return "{$days}days {$hours}hrs";
+    }
+    ?>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+          <?php if (empty($auctions)): ?>
+              <div class="col-12 text-center">
+                  <p class="lead">No active auctions match your search. Try different criteria!</p>
               </div>
-          <?php endforeach; ?>
-      <?php endif; ?>
-  </div>
+          <?php else: ?>
+              <?php foreach ($auctions as $auction): ?>
+                  <div class="col" data-aos="fade-up">
+                      <a href="listing.php?item_id=<?php echo $auction['item_id']; ?>" class="text-decoration-none">
+                          <div class="card h-100 shadow-sm hover-effect">
+                              <?php if (!empty($auction['image_url'])): ?>
+                                  <img src="<?php echo htmlspecialchars($auction['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($auction['item_name']); ?>">
+                              <?php endif; ?>
+                              <div class="card-body">
+                                  <h5 class="card-title text-primary"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
+                                  <p class="card-text text-muted"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
+                                  <p class="card-text"><strong>Current Price:</strong> $<?php echo number_format($auction['current_price'], 2); ?></p>
+                                  <p class="card-text"><strong>Bids:</strong> <?php echo $auction['num_bids']; ?></p>
+                                  <p class="card-text"><strong>Ends:</strong> <?php echo (new DateTime($auction['end_date']))->format('Y-m-d H:i:s'); ?></p>
+                                  <p class="card-text"><strong>Time Remaining:</strong> <?php echo getRemainingTime($auction['end_date']); ?></p>
+                              </div>
+                          </div>
+                      </a>
+                  </div>
+              <?php endforeach; ?>
+          <?php endif; ?>
+    </div>
   
 
     <nav aria-label="Search results pages" class="my-4">
