@@ -6,22 +6,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-  <!-- Bootstrap 5 和 FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-  <!-- AOS CSS -->
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
 
-  <!-- 自定义CSS -->
-  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="css/custom_1.css">
 
   <title>Browse Auctions - My Auction Site</title>
 </head>
 
 <body>
 
-<!-- Navigation bar -->
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
     <a class="navbar-brand" href="#">My Auction Site</a>
@@ -125,19 +123,19 @@
       ?>
     <?php endif; ?>
 
-    <div id="searchSpecs" class="bg-light p-4 rounded shadow-sm mb-4">
+    <div id="searchSpecs" class="search-container bg-white p-4 rounded-pill shadow mb-4">
       <form method="get" action="browse.php">
         <div class="row g-3 align-items-center">
           <div class="col-md-5">
             <div class="input-group">
-              <span class="input-group-text bg-white">
+              <span class="input-group-text bg-transparent border-0">
                 <i class="fa fa-search"></i>
               </span>
-              <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Search for anything">
+              <input type="text" class="form-control border-0" id="keyword" name="keyword" placeholder="Search for anything">
             </div>
           </div>
           <div class="col-md-3">
-            <select class="form-select" id="cat" name="cat">
+            <select class="form-select border-0" id="cat" name="cat">
               <option selected value="all">All categories</option>
               <?php
               $stmt = $pdo->prepare("SELECT category_id, category_name FROM category ORDER BY category_name");
@@ -153,8 +151,8 @@
           </div>
           <div class="col-md-3">
             <div class="input-group">
-              <label class="input-group-text" for="order_by">Sort by:</label>
-              <select class="form-select" id="order_by" name="order_by">
+              <label class="input-group-text bg-transparent border-0" for="order_by">Sort by:</label>
+              <select class="form-select border-0" id="order_by" name="order_by">
                 <option selected value="price_low">Price (low to high)</option>
                 <option value="price_high">Price (high to low)</option>
                 <option value="date_asc">Expiry (soonest first)</option>
@@ -163,7 +161,7 @@
             </div>
           </div>
           <div class="col-md-1">
-            <button type="submit" class="btn btn-primary w-100">Search</button>
+            <button type="submit" class="btn btn-primary rounded-pill w-100">Search</button>
           </div>
         </div>
       </form>
@@ -233,7 +231,7 @@
         $order = "ORDER BY i.item_id ASC";
     }
 
-    $full_query = "SELECT i.item_id, i.item_name, i.description, COALESCE(MAX(b.bid_amount), i.starting_price) AS current_price, COUNT(b.bid_id) AS num_bids, i.end_date
+    $full_query = "SELECT i.item_id, i.item_name, i.description, COALESCE(MAX(b.bid_amount), i.starting_price) AS current_price, COUNT(b.bid_id) AS num_bids, i.end_date, i.image_url
                     $base_query
                     $group_query
                     $order
@@ -269,48 +267,71 @@
 
     <?php
     function getRemainingTime($endDate) {
-        $now = new DateTime();
-        $end = new DateTime($endDate);
-        $interval = $now->diff($end);
-        
-        if ($interval->invert) {
-            return "Ended";
-        }
-        
-        $days = $interval->d;
-        $hours = $interval->h;
-        
-        return "{$days}days {$hours}hrs";
-    }
+      $now = new DateTime();
+      $end = new DateTime($endDate);
+      $interval = $now->diff($end);
+      
+      if ($interval->invert) {
+          return "Ended";
+      }
+  
+      $parts = [];
+  
+      if ($interval->y > 0) {
+          $parts[] = $interval->y . " year" . ($interval->y > 1 ? "s" : "");
+      }
+  
+      if ($interval->m > 0) {
+          $parts[] = $interval->m . " month" . ($interval->m > 1 ? "s" : "");
+      }
+  
+      if ($interval->d > 0) {
+          $parts[] = $interval->d . " day" . ($interval->d > 1 ? "s" : "");
+      }
+  
+      if ($interval->h > 0) {
+          $parts[] = $interval->h . " hour" . ($interval->h > 1 ? "s" : "");
+      }
+  
+      if (empty($parts)) {
+          return "Less than an hour";
+      }
+  
+      return implode(" ", array_slice($parts, 0, 2)); // 只返回最大的两个时间单位
+  }
     ?>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
-          <?php if (empty($auctions)): ?>
-              <div class="col-12 text-center">
-                  <p class="lead">No active auctions match your search. Try different criteria!</p>
-              </div>
-          <?php else: ?>
-              <?php foreach ($auctions as $auction): ?>
-                  <div class="col" data-aos="fade-up">
-                      <a href="listing.php?item_id=<?php echo $auction['item_id']; ?>" class="text-decoration-none">
-                          <div class="card h-100 shadow-sm hover-effect">
-                              <?php if (!empty($auction['image_url'])): ?>
-                                  <img src="<?php echo htmlspecialchars($auction['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($auction['item_name']); ?>">
-                              <?php endif; ?>
-                              <div class="card-body">
-                                  <h5 class="card-title text-primary"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
-                                  <p class="card-text text-muted"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
-                                  <p class="card-text"><strong>Current Price:</strong> $<?php echo number_format($auction['current_price'], 2); ?></p>
-                                  <p class="card-text"><strong>Bids:</strong> <?php echo $auction['num_bids']; ?></p>
-                                  <p class="card-text"><strong>Ends:</strong> <?php echo (new DateTime($auction['end_date']))->format('Y-m-d H:i:s'); ?></p>
-                                  <p class="card-text"><strong>Time Remaining:</strong> <?php echo getRemainingTime($auction['end_date']); ?></p>
-                              </div>
-                          </div>
-                      </a>
-                  </div>
-              <?php endforeach; ?>
-          <?php endif; ?>
-    </div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+    <?php if (empty($auctions)): ?>
+        <div class="col-12 text-center">
+            <p class="lead">No active auctions match your search. Try different criteria!</p>
+        </div>
+    <?php else: ?>
+        <?php foreach ($auctions as $auction): ?>
+            <div class="col" data-aos="fade-up">
+                <div class="card auction-card h-100 shadow-sm hover-effect">
+                    <a href="listing.php?item_id=<?php echo $auction['item_id']; ?>" class="text-decoration-none">
+                        <?php if (!empty($auction['image_url'])): ?>
+                            <div class="card-img-top-wrapper">
+                                <img src="<?php echo htmlspecialchars($auction['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($auction['item_name']); ?>">
+                            </div>
+                        <?php endif; ?>
+                        <div class="card-body">
+                            <h5 class="card-title text-primary mb-3"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
+                            <p class="card-text text-muted mb-3"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-success">$<?php echo number_format($auction['current_price'], 2); ?></span>
+                                <span class="badge bg-primary rounded-pill"><?php echo $auction['num_bids']; ?> bids</span>
+                            </div>
+                            <p class="card-text small mb-1"><i class="fas fa-clock me-2"></i><?php echo getRemainingTime($auction['end_date']); ?> left</p>
+                            <p class="card-text small"><i class="fas fa-calendar-alt me-2"></i>Ends: <?php echo (new DateTime($auction['end_date']))->format('M d, Y H:i'); ?></p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
   
 
     <nav aria-label="Search results pages" class="my-4">
