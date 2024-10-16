@@ -279,7 +279,7 @@
       $parts = [];
   
       if ($interval->y > 0) {
-          $parts[] = $interval->y . " year" . ($interval->y > 1 ? "s1" : "");
+          $parts[] = $interval->y . " year" . ($interval->y > 1 ? "s" : "");
       }
   
       if ($interval->m > 0) {
