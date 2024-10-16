@@ -54,7 +54,7 @@ body {
 
 .search-container {
   transition: all 0.3s ease;
-  border-radius: 50px !important; /* 使用 !important 来确保覆盖 Bootstrap 的样式 */
+  border-radius: 50px !important;
 }
 
 .search-container:hover {
@@ -98,4 +98,56 @@ body {
   .search-container .btn {
     border-radius: 25px !important;
   }
+}
+
+body {
+  background-color: #e6f3ff !important;
+}
+
+.jumbotron.bg-image {
+  background-image: 
+    linear-gradient(
+      to bottom,
+      rgba(230, 243, 255, 0) 0%,
+      rgba(230, 243, 255, 0) calc(100% - 100px),
+      rgba(230, 243, 255, 1) 100%
+    ),
+    url('../images/background/background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 80%;
+  height: 400px; 
+  position: relative;
+  overflow: hidden; 
+}
+
+.jumbotron.bg-image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(to bottom, rgba(230, 243, 255, 0) 0%, rgba(230, 243, 255, 0.6) 100%);
+}
+
+.jumbotron.bg-image .container {
+  position: relative;
+  z-index: 2;
+}
+
+.jumbotron h1, .jumbotron p {
+  color: #003366;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.main-content {
+  background-color: rgba(255, 255, 255, 0.8); 
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: -100px;
+  position: relative;
+  z-index: 3;
 }

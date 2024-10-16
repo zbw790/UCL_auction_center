@@ -103,14 +103,15 @@
   </div>
 </div>
 
-<div class="container-fluid p-0">
-  <div class="jumbotron bg-primary text-white text-center py-5 mb-4">
+<div class="jumbotron bg-image text-white text-center py-5 mb-4">
+  <div class="container">
     <h1 class="display-4">Discover Amazing Auctions</h1>
     <p class="lead">Find unique items and great deals!</p>
   </div>
+</div>
 
-  <div class="container">
-    <h2 class="my-4">Browse Listings</h2>
+  <div class="container main-content">
+    <!-- <h2 class="my-4">Browse Listings</h2> -->
 
     <?php if (isset($_SESSION['message'])): ?>
       <div class="alert alert-<?php echo $_SESSION['message_type']; ?> alert-dismissible fade show" role="alert">
