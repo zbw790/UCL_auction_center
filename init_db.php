@@ -66,10 +66,10 @@ try {
     ");
     echo "Category table created or already exists.\n";
 
-    // Check and create item table
+    // Check and create auction table (previously item table)
     $pdo->exec("
-        CREATE TABLE IF NOT EXISTS item (
-            item_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS auction (
+            auction_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             seller_id INT UNSIGNED NOT NULL,
             item_name VARCHAR(255) NOT NULL,
             description TEXT,
@@ -88,17 +88,17 @@ try {
             CONSTRAINT check_dates CHECK (end_date > start_date)
         )
     ");
-    echo "Item table created or already exists.\n";
+    echo "Auction table created or already exists.\n";
 
     // Check and create bid table
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS bid (
             bid_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            item_id INT UNSIGNED NOT NULL,
+            auction_id INT UNSIGNED NOT NULL,
             user_id INT UNSIGNED NOT NULL,
             bid_amount DECIMAL(10, 2) NOT NULL,
             bid_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (item_id) REFERENCES item(item_id),
+            FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
             FOREIGN KEY (user_id) REFERENCES user(user_id)
         )
     ");
@@ -108,11 +108,11 @@ try {
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS auction_transaction (
             transaction_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            item_id INT UNSIGNED NOT NULL UNIQUE,
+            auction_id INT UNSIGNED NOT NULL UNIQUE,
             buyer_id INT UNSIGNED NOT NULL,
             transaction_amount DECIMAL(10, 2) NOT NULL,
             transaction_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (item_id) REFERENCES item(item_id),
+            FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
             FOREIGN KEY (buyer_id) REFERENCES user(user_id)
         )
     ");
@@ -146,7 +146,7 @@ try {
     echo "Sample users inserted or already exist.\n";
 
     $pdo->exec("
-    INSERT IGNORE INTO item (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, highest_bidder_id, image_url, status) VALUES
+    INSERT IGNORE INTO auction (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, highest_bidder_id, image_url, status) VALUES
     (1, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', 5, '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 180.00, 2, './images/1.jpg', 'active'),
     (2, 'Gaming Laptop', 'High-performance gaming laptop', 1, '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 950.00, 3, './images/2.jpg', 'active'),
     (3, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', 5, '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 7500.00, 4, './images/3.jpg', 'ended'),
@@ -164,10 +164,10 @@ try {
     (7, 'Board Game Collection', 'Collection of popular board games', 7, '2024-09-20 14:00:00', '2024-10-30 14:00:00', 100.00, 150.00, 120.00, 4, './images/4.jpg', 'active'),
     (8, 'Digital Camera', 'High-end digital camera with accessories', 1, '2024-09-25 16:00:00', '2024-11-05 16:00:00', 600.00, 800.00, 700.00, 5, './images/5.jpg', 'active')
     ");
-    echo "Sample items inserted or already exist.\n";
+    echo "Sample auctions inserted or already exist.\n";
 
     $pdo->exec("
-    INSERT IGNORE INTO bid (item_id, user_id, bid_amount, bid_date) VALUES
+    INSERT IGNORE INTO bid (auction_id, user_id, bid_amount, bid_date) VALUES
     (1, 2, 150.00, '2024-09-25 14:30:00'),
     (1, 3, 180.00, '2024-10-05 16:45:00'),
     (2, 3, 900.00, '2024-09-30 11:15:00'),
@@ -200,7 +200,7 @@ try {
     echo "Sample bids inserted or already exist.\n";
 
     $pdo->exec("
-    INSERT IGNORE INTO auction_transaction (item_id, buyer_id, transaction_amount, transaction_date) VALUES
+    INSERT IGNORE INTO auction_transaction (auction_id, buyer_id, transaction_amount, transaction_date) VALUES
     (3, 4, 7500.00, '2024-10-10 14:01:00'),
     (11, 1, 200.00, '2024-10-05 13:01:00')
     ");

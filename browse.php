@@ -200,39 +200,39 @@
 
     $params = array();
 
-    $base_query = "FROM item i
-                    LEFT JOIN bid b ON i.item_id = b.item_id
-                    WHERE i.status = 'active'";
+    $base_query = "FROM auction a
+                LEFT JOIN bid b ON a.auction_id = b.auction_id
+                WHERE a.status = 'active'";
 
     if(!empty($keyword)) {
-      $base_query .= " AND (i.item_name LIKE :keyword OR i.description LIKE :keyword)";
+      $base_query .= " AND (a.item_name LIKE :keyword OR a.description LIKE :keyword)";
       $params[":keyword"] = '%' . $keyword . '%';
     }
     if($category != "all") {
-      $base_query .= "AND i.category_id = :category_id";
+      $base_query .= " AND a.category_id = :category_id";
       $params[":category_id"] = $category;
     }
 
-    $group_query = " GROUP BY i.item_id";
+    $group_query = " GROUP BY a.auction_id";
 
     switch ($ordering) {
       case 'price_low':
-        $order = "ORDER BY COALESCE(MAX(b.bid_amount), i.starting_price) ASC";
+        $order = "ORDER BY COALESCE(MAX(b.bid_amount), a.starting_price) ASC";
         break;
       case 'price_high':
-        $order = "ORDER BY COALESCE(MAX(b.bid_amount), i.starting_price) DESC";
+        $order = "ORDER BY COALESCE(MAX(b.bid_amount), a.starting_price) DESC";
         break;
       case 'date_asc':
-        $order = "ORDER BY i.end_date ASC";
+        $order = "ORDER BY a.end_date ASC";
         break;
       case 'date_desc':
-        $order = "ORDER BY i.end_date DESC";
+        $order = "ORDER BY a.end_date DESC";
         break;
       default:
-        $order = "ORDER BY i.item_id ASC";
+        $order = "ORDER BY a.auction_id ASC";
     }
 
-    $full_query = "SELECT i.item_id, i.item_name, i.description, COALESCE(MAX(b.bid_amount), i.starting_price) AS current_price, COUNT(b.bid_id) AS num_bids, i.end_date, i.image_url
+    $full_query = "SELECT a.auction_id, a.item_name, a.description, COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price, COUNT(b.bid_id) AS num_bids, a.end_date, a.image_url
                     $base_query
                     $group_query
                     $order
@@ -251,8 +251,8 @@
     $stmt->execute();
     $auctions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $count_query = "SELECT COUNT(DISTINCT i.item_id) AS total
-                    $base_query";
+    $count_query = "SELECT COUNT(DISTINCT a.auction_id) AS total
+                $base_query";
     $stmt = $pdo->prepare($count_query);
 
     if (!empty($params)) {
@@ -302,37 +302,37 @@
   }
     ?>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
-    <?php if (empty($auctions)): ?>
-        <div class="col-12 text-center">
-            <p class="lead">No active auctions match your search. Try different criteria!</p>
-        </div>
-    <?php else: ?>
-        <?php foreach ($auctions as $auction): ?>
-            <div class="col" data-aos="fade-up">
-                <div class="card auction-card h-100 shadow-sm hover-effect">
-                    <a href="listing.php?item_id=<?php echo $auction['item_id']; ?>" class="text-decoration-none">
-                        <?php if (!empty($auction['image_url'])): ?>
-                            <div class="card-img-top-wrapper">
-                                <img src="<?php echo htmlspecialchars($auction['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($auction['item_name']); ?>">
-                            </div>
-                        <?php endif; ?>
-                        <div class="card-body">
-                            <h5 class="card-title text-primary mb-3"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
-                            <p class="card-text text-muted mb-3"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="fw-bold text-success">$<?php echo number_format($auction['current_price'], 2); ?></span>
-                                <span class="badge bg-primary rounded-pill"><?php echo $auction['num_bids']; ?> bids</span>
-                            </div>
-                            <p class="card-text small mb-1"><i class="fas fa-clock me-2"></i><?php echo getRemainingTime($auction['end_date']); ?> left</p>
-                            <p class="card-text small"><i class="fas fa-calendar-alt me-2"></i>Ends: <?php echo (new DateTime($auction['end_date']))->format('M d, Y H:i'); ?></p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</div>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+      <?php if (empty($auctions)): ?>
+          <div class="col-12 text-center">
+              <p class="lead">No active auctions match your search. Try different criteria!</p>
+          </div>
+      <?php else: ?>
+          <?php foreach ($auctions as $auction): ?>
+              <div class="col" data-aos="fade-up">
+                  <div class="card auction-card h-100 shadow-sm hover-effect">
+                      <a href="listing.php?auction_id=<?php echo $auction['auction_id']; ?>" class="text-decoration-none">
+                          <?php if (!empty($auction['image_url'])): ?>
+                              <div class="card-img-top-wrapper">
+                                  <img src="<?php echo htmlspecialchars($auction['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($auction['item_name']); ?>">
+                              </div>
+                          <?php endif; ?>
+                          <div class="card-body">
+                              <h5 class="card-title text-primary mb-3"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
+                              <p class="card-text text-muted mb-3"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
+                              <div class="d-flex justify-content-between align-items-center mb-2">
+                                  <span class="fw-bold text-success">$<?php echo number_format($auction['current_price'], 2); ?></span>
+                                  <span class="badge bg-primary rounded-pill"><?php echo $auction['num_bids']; ?> bids</span>
+                              </div>
+                              <p class="card-text small mb-1"><i class="fas fa-clock me-2"></i><?php echo getRemainingTime($auction['end_date']); ?> left</p>
+                              <p class="card-text small"><i class="fas fa-calendar-alt me-2"></i>Ends: <?php echo (new DateTime($auction['end_date']))->format('M d, Y H:i'); ?></p>
+                          </div>
+                      </a>
+                  </div>
+              </div>
+          <?php endforeach; ?>
+      <?php endif; ?>
+  </div>
   
 
     <nav aria-label="Search results pages" class="my-4">
