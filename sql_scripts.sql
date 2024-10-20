@@ -21,16 +21,11 @@ CREATE TABLE personal_info (
   user_id INT UNSIGNED NOT NULL,
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
-  address_line1 VARCHAR(255) NOT NULL,
-  address_line2 VARCHAR(255),
-  city VARCHAR(100) NOT NULL,
-  state VARCHAR(100) NOT NULL,
-  postal_code VARCHAR(20) NOT NULL,
-  country VARCHAR(100) NOT NULL,
   phone_number VARCHAR(20) NOT NULL,
   UNIQUE (user_id),
   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
+
 
 -- Category table
 CREATE TABLE category (
@@ -79,6 +74,41 @@ CREATE TABLE auction_transaction (
   transaction_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (item_id) REFERENCES item(item_id),
   FOREIGN KEY (buyer_id) REFERENCES user(user_id)
+);
+
+CREATE TABLE outbid_notification (
+    notification_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    auction_id INT UNSIGNED NOT NULL,
+    outbid_user_id INT UNSIGNED NOT NULL,
+    FOREIGN KEY (auction_id) REFERENCES item(item_id),
+    FOREIGN KEY (outbid_user_id) REFERENCES user(user_id)
+);
+
+CREATE TABLE private_message (
+    message_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT UNSIGNED NOT NULL,
+    receiver_id INT UNSIGNED NOT NULL,
+    message_content TEXT NOT NULL,
+    sent_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES user(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES user(user_id),
+    INDEX idx_sender (sender_id),
+    INDEX idx_receiver (receiver_id),
+    INDEX idx_sent_date (sent_date)
+);
+
+CREATE TABLE user_rating (
+    rating_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    transaction_id INT UNSIGNED NOT NULL UNIQUE,
+    buyer_id INT UNSIGNED NOT NULL,
+    seller_id INT UNSIGNED NOT NULL,
+    rating_score INT NOT NULL,
+    rating_comment TEXT,
+    rating_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (transaction_id) REFERENCES auction_transaction(transaction_id),
+    FOREIGN KEY (buyer_id) REFERENCES user(user_id),
+    FOREIGN KEY (seller_id) REFERENCES user(user_id),
+    CHECK (rating_score >= 1 AND rating_score <= 5)
 );
 
 -- Insert sample categories
