@@ -26,16 +26,15 @@ CREATE TABLE personal_info (
   FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
-
 -- Category table
 CREATE TABLE category (
   category_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   category_name VARCHAR(100) NOT NULL UNIQUE
 );
 
--- Item table
-CREATE TABLE item (
-  item_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+-- Auction table
+CREATE TABLE auction (
+  auction_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   seller_id INT UNSIGNED NOT NULL,
   item_name VARCHAR(255) NOT NULL,
   description TEXT,
@@ -45,34 +44,34 @@ CREATE TABLE item (
   starting_price DECIMAL(10, 2) NOT NULL,
   reserve_price DECIMAL(10, 2),
   highest_bid DECIMAL(10, 2),
-  highest_bidder_id INT UNSIGNED NULL,
+  highest_bid_id INT UNSIGNED NULL,
   image_url VARCHAR(2083),
   status ENUM('active', 'ended', 'cancelled') NOT NULL DEFAULT 'active',
   FOREIGN KEY (seller_id) REFERENCES user(user_id),
   FOREIGN KEY (category_id) REFERENCES category(category_id),
-  FOREIGN KEY (highest_bidder_id) REFERENCES user(user_id),
+  FOREIGN KEY (highest_bid_id) REFERENCES bid(bid_id),
   CONSTRAINT check_dates CHECK (end_date > start_date)
 );
 
 -- Bid table
 CREATE TABLE bid (
   bid_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  item_id INT UNSIGNED NOT NULL,
+  auction_id INT UNSIGNED NOT NULL,
   user_id INT UNSIGNED NOT NULL,
   bid_amount DECIMAL(10, 2) NOT NULL,
   bid_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (item_id) REFERENCES item(item_id),
+  FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
   FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
 -- Auction Transaction table
 CREATE TABLE auction_transaction (
   transaction_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  item_id INT UNSIGNED NOT NULL UNIQUE,
+  auction_id INT UNSIGNED NOT NULL UNIQUE,
   buyer_id INT UNSIGNED NOT NULL,
   transaction_amount DECIMAL(10, 2) NOT NULL,
   transaction_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (item_id) REFERENCES item(item_id),
+  FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
   FOREIGN KEY (buyer_id) REFERENCES user(user_id)
 );
 
@@ -80,7 +79,7 @@ CREATE TABLE outbid_notification (
     notification_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     auction_id INT UNSIGNED NOT NULL,
     outbid_user_id INT UNSIGNED NOT NULL,
-    FOREIGN KEY (auction_id) REFERENCES item(item_id),
+    FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
     FOREIGN KEY (outbid_user_id) REFERENCES user(user_id)
 );
 
