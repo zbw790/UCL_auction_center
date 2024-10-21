@@ -131,27 +131,27 @@ INSERT INTO user (username, email, password, registration_date) VALUES
 ('chris_lee', 'chris@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-07 11:45:00'),
 ('lisa_wang', 'lisa@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-08 15:30:00');
 
--- Insert 16 auctions (items)
-INSERT INTO item (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, highest_bidder_id, image_url, status) VALUES
-(1, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', 5, '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 180.00, 2, './images/1.jpg', 'active'),
-(2, 'Gaming Laptop', 'High-performance gaming laptop', 1, '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 950.00, 3, './images/2.jpg', 'active'),
-(3, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', 5, '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 7500.00, 4, './images/3.jpg', 'ended'),
-(4, 'Mountain Bike', 'Professional mountain bike, barely used', 4, '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 450.00, 1, './images/4.jpg', 'active'),
-(1, 'Designer Handbag', 'Limited edition designer handbag', 2, '2024-09-30 11:00:00', '2024-11-05 11:00:00', 1000.00, 1500.00, 1200.00, 2, './images/5.jpg', 'active'),
-(2, 'Smart Home Kit', 'Complete smart home automation kit', 3, '2024-10-05 13:00:00', '2024-11-10 13:00:00', 200.00, 300.00, 250.00, 4, './images/6.jpg', 'active'),
-(3, 'Classic Car', 'Restored classic car from the 1970s', 6, '2024-10-10 15:00:00', '2024-11-15 15:00:00', 15000.00, 20000.00, 18000.00, 1, './images/7.jpg', 'active'),
-(4, 'Rare Comic Book', 'First edition rare comic book', 5, '2024-10-15 10:00:00', '2024-11-20 10:00:00', 500.00, 1000.00, 800.00, 3, './images/8.jpg', 'active'),
-(5, 'Smartphone', 'Latest model smartphone', 1, '2024-10-20 09:00:00', '2024-11-25 09:00:00', 500.00, 700.00, 650.00, 6, './images/9.jpg', 'active'),
-(6, 'Leather Jacket', 'Vintage leather jacket', 2, '2024-10-25 11:00:00', '2024-11-30 11:00:00', 200.00, 300.00, 280.00, 7, './images/10.jpg', 'active'),
-(7, 'Gardening Tools Set', 'Complete set of gardening tools', 3, '2024-09-01 13:00:00', '2024-10-05 13:00:00', 150.00, 250.00, 200.00, 8, './images/11.jpg', 'ended'),
-(8, 'Tennis Racket', 'Professional tennis racket', 4, '2024-09-05 15:00:00', '2024-10-15 15:00:00', 100.00, 150.00, 130.00, 1, './images/1.jpg', 'active'),
-(5, 'Antique Clock', 'Rare antique clock from the 18th century', 5, '2024-09-10 10:00:00', '2024-10-20 10:00:00', 2000.00, 3000.00, 2500.00, 2, './images/2.jpg', 'active'),
-(6, 'Electric Scooter', 'Foldable electric scooter', 6, '2024-09-15 12:00:00', '2024-10-25 12:00:00', 300.00, 400.00, 350.00, 3, './images/3.jpg', 'active'),
-(7, 'Board Game Collection', 'Collection of popular board games', 7, '2024-09-20 14:00:00', '2024-10-30 14:00:00', 100.00, 150.00, 120.00, 4, './images/4.jpg', 'active'),
-(8, 'Digital Camera', 'High-end digital camera with accessories', 1, '2024-09-25 16:00:00', '2024-11-05 16:00:00', 600.00, 800.00, 700.00, 5, './images/5.jpg', 'active');
+-- Insert 16 auctions
+INSERT INTO auction (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, highest_bid_id, image_url, status) VALUES
+(1, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', 5, '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 180.00, NULL, './images/1.jpg', 'active'),
+(2, 'Gaming Laptop', 'High-performance gaming laptop', 1, '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 950.00, NULL, './images/2.jpg', 'active'),
+(3, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', 5, '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 7500.00, NULL, './images/3.jpg', 'ended'),
+(4, 'Mountain Bike', 'Professional mountain bike, barely used', 4, '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 450.00, NULL, './images/4.jpg', 'active'),
+(1, 'Designer Handbag', 'Limited edition designer handbag', 2, '2024-09-30 11:00:00', '2024-11-05 11:00:00', 1000.00, 1500.00, 1200.00, NULL, './images/5.jpg', 'active'),
+(2, 'Smart Home Kit', 'Complete smart home automation kit', 3, '2024-10-05 13:00:00', '2024-11-10 13:00:00', 200.00, 300.00, 250.00, NULL, './images/6.jpg', 'active'),
+(3, 'Classic Car', 'Restored classic car from the 1970s', 6, '2024-10-10 15:00:00', '2024-11-15 15:00:00', 15000.00, 20000.00, 18000.00, NULL, './images/7.jpg', 'active'),
+(4, 'Rare Comic Book', 'First edition rare comic book', 5, '2024-10-15 10:00:00', '2024-11-20 10:00:00', 500.00, 1000.00, 800.00, NULL, './images/8.jpg', 'active'),
+(5, 'Smartphone', 'Latest model smartphone', 1, '2024-10-20 09:00:00', '2024-11-25 09:00:00', 500.00, 700.00, 650.00, NULL, './images/9.jpg', 'active'),
+(6, 'Leather Jacket', 'Vintage leather jacket', 2, '2024-10-25 11:00:00', '2024-11-30 11:00:00', 200.00, 300.00, 280.00, NULL, './images/10.jpg', 'active'),
+(7, 'Gardening Tools Set', 'Complete set of gardening tools', 3, '2024-09-01 13:00:00', '2024-10-05 13:00:00', 150.00, 250.00, 200.00, NULL, './images/11.jpg', 'ended'),
+(8, 'Tennis Racket', 'Professional tennis racket', 4, '2024-09-05 15:00:00', '2024-10-15 15:00:00', 100.00, 150.00, 130.00, NULL, './images/1.jpg', 'active'),
+(5, 'Antique Clock', 'Rare antique clock from the 18th century', 5, '2024-09-10 10:00:00', '2024-10-20 10:00:00', 2000.00, 3000.00, 2500.00, NULL, './images/2.jpg', 'active'),
+(6, 'Electric Scooter', 'Foldable electric scooter', 6, '2024-09-15 12:00:00', '2024-10-25 12:00:00', 300.00, 400.00, 350.00, NULL, './images/3.jpg', 'active'),
+(7, 'Board Game Collection', 'Collection of popular board games', 7, '2024-09-20 14:00:00', '2024-10-30 14:00:00', 100.00, 150.00, 120.00, NULL, './images/4.jpg', 'active'),
+(8, 'Digital Camera', 'High-end digital camera with accessories', 1, '2024-09-25 16:00:00', '2024-11-05 16:00:00', 600.00, 800.00, 700.00, NULL, './images/5.jpg', 'active');
 
 -- Insert bids for each auction
-INSERT INTO bid (item_id, user_id, bid_amount, bid_date) VALUES
+INSERT INTO bid (auction_id, user_id, bid_amount, bid_date) VALUES
 (1, 2, 150.00, '2024-09-25 14:30:00'),
 (1, 3, 180.00, '2024-10-05 16:45:00'),
 (2, 3, 900.00, '2024-09-30 11:15:00'),
@@ -182,6 +182,6 @@ INSERT INTO bid (item_id, user_id, bid_amount, bid_date) VALUES
 (15, 5, 120.00, '2024-10-15 13:35:00');
 
 -- Insert transactions for the ended auctions
-INSERT INTO auction_transaction (item_id, buyer_id, transaction_amount, transaction_date) VALUES
+INSERT INTO auction_transaction (auction_id, buyer_id, transaction_amount, transaction_date) VALUES
 (3, 4, 7500.00, '2024-10-10 14:01:00'),
 (11, 1, 200.00, '2024-10-05 13:01:00');

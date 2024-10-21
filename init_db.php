@@ -31,7 +31,7 @@ try {
             user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(255) NOT NULL UNIQUE,
             email VARCHAR(255) UNIQUE NOT NULL,
-            password CHAR(60) NOT NULL,
+            password VARCHAR(255) NOT NULL,
             registration_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
     ");
@@ -44,12 +44,6 @@ try {
             user_id INT UNSIGNED NOT NULL,
             first_name VARCHAR(100) NOT NULL,
             last_name VARCHAR(100) NOT NULL,
-            address_line1 VARCHAR(255) NOT NULL,
-            address_line2 VARCHAR(255),
-            city VARCHAR(100) NOT NULL,
-            state VARCHAR(100) NOT NULL,
-            postal_code VARCHAR(20) NOT NULL,
-            country VARCHAR(100) NOT NULL,
             phone_number VARCHAR(20) NOT NULL,
             UNIQUE (user_id),
             FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
@@ -66,7 +60,7 @@ try {
     ");
     echo "Category table created or already exists.\n";
 
-    // Check and create auction table (previously item table)
+    // Check and create auction table
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS auction (
             auction_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -79,12 +73,11 @@ try {
             starting_price DECIMAL(10, 2) NOT NULL,
             reserve_price DECIMAL(10, 2),
             highest_bid DECIMAL(10, 2),
-            highest_bidder_id INT UNSIGNED NULL,
+            highest_bid_id INT UNSIGNED NULL,
             image_url VARCHAR(2083),
             status ENUM('active', 'ended', 'cancelled') NOT NULL DEFAULT 'active',
             FOREIGN KEY (seller_id) REFERENCES user(user_id),
             FOREIGN KEY (category_id) REFERENCES category(category_id),
-            FOREIGN KEY (highest_bidder_id) REFERENCES user(user_id),
             CONSTRAINT check_dates CHECK (end_date > start_date)
         )
     ");
@@ -118,6 +111,53 @@ try {
     ");
     echo "Auction transaction table created or already exists.\n";
 
+    // Check and create outbid_notification table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS outbid_notification (
+            notification_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            auction_id INT UNSIGNED NOT NULL,
+            outbid_user_id INT UNSIGNED NOT NULL,
+            FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
+            FOREIGN KEY (outbid_user_id) REFERENCES user(user_id)
+        )
+    ");
+    echo "Outbid notification table created or already exists.\n";
+
+    // Check and create private_message table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS private_message (
+            message_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            sender_id INT UNSIGNED NOT NULL,
+            receiver_id INT UNSIGNED NOT NULL,
+            message_content TEXT NOT NULL,
+            sent_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (sender_id) REFERENCES user(user_id),
+            FOREIGN KEY (receiver_id) REFERENCES user(user_id),
+            INDEX idx_sender (sender_id),
+            INDEX idx_receiver (receiver_id),
+            INDEX idx_sent_date (sent_date)
+        )
+    ");
+    echo "Private message table created or already exists.\n";
+
+    // Check and create user_rating table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS user_rating (
+            rating_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            transaction_id INT UNSIGNED NOT NULL UNIQUE,
+            buyer_id INT UNSIGNED NOT NULL,
+            seller_id INT UNSIGNED NOT NULL,
+            rating_score INT NOT NULL,
+            rating_comment TEXT,
+            rating_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (transaction_id) REFERENCES auction_transaction(transaction_id),
+            FOREIGN KEY (buyer_id) REFERENCES user(user_id),
+            FOREIGN KEY (seller_id) REFERENCES user(user_id),
+            CHECK (rating_score >= 1 AND rating_score <= 5)
+        )
+    ");
+    echo "User rating table created or already exists.\n";
+
     // Insert sample data into category table, using INSERT IGNORE to avoid duplicate entries
     $pdo->exec("
         INSERT IGNORE INTO category (category_name) VALUES 
@@ -146,23 +186,23 @@ try {
     echo "Sample users inserted or already exist.\n";
 
     $pdo->exec("
-    INSERT IGNORE INTO auction (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, highest_bidder_id, image_url, status) VALUES
-    (1, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', 5, '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 180.00, 2, './images/1.jpg', 'active'),
-    (2, 'Gaming Laptop', 'High-performance gaming laptop', 1, '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 950.00, 3, './images/2.jpg', 'active'),
-    (3, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', 5, '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 7500.00, 4, './images/3.jpg', 'ended'),
-    (4, 'Mountain Bike', 'Professional mountain bike, barely used', 4, '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 450.00, 1, './images/4.jpg', 'active'),
-    (1, 'Designer Handbag', 'Limited edition designer handbag', 2, '2024-09-30 11:00:00', '2024-11-05 11:00:00', 1000.00, 1500.00, 1200.00, 2, './images/5.jpg', 'active'),
-    (2, 'Smart Home Kit', 'Complete smart home automation kit', 3, '2024-10-05 13:00:00', '2024-11-10 13:00:00', 200.00, 300.00, 250.00, 4, './images/6.jpg', 'active'),
-    (3, 'Classic Car', 'Restored classic car from the 1970s', 6, '2024-10-10 15:00:00', '2024-11-15 15:00:00', 15000.00, 20000.00, 18000.00, 1, './images/7.jpg', 'active'),
-    (4, 'Rare Comic Book', 'First edition rare comic book', 5, '2024-10-15 10:00:00', '2024-11-20 10:00:00', 500.00, 1000.00, 800.00, 3, './images/8.jpg', 'active'),
-    (5, 'Smartphone', 'Latest model smartphone', 1, '2024-10-20 09:00:00', '2024-11-25 09:00:00', 500.00, 700.00, 650.00, 6, './images/9.jpg', 'active'),
-    (6, 'Leather Jacket', 'Vintage leather jacket', 2, '2024-10-25 11:00:00', '2024-11-30 11:00:00', 200.00, 300.00, 280.00, 7, './images/10.jpg', 'active'),
-    (7, 'Gardening Tools Set', 'Complete set of gardening tools', 3, '2024-09-01 13:00:00', '2024-10-05 13:00:00', 150.00, 250.00, 200.00, 8, './images/11.jpg', 'ended'),
-    (8, 'Tennis Racket', 'Professional tennis racket', 4, '2024-09-05 15:00:00', '2024-10-15 15:00:00', 100.00, 150.00, 130.00, 1, './images/1.jpg', 'active'),
-    (5, 'Antique Clock', 'Rare antique clock from the 18th century', 5, '2024-09-10 10:00:00', '2024-10-20 10:00:00', 2000.00, 3000.00, 2500.00, 2, './images/2.jpg', 'active'),
-    (6, 'Electric Scooter', 'Foldable electric scooter', 6, '2024-09-15 12:00:00', '2024-10-25 12:00:00', 300.00, 400.00, 350.00, 3, './images/3.jpg', 'active'),
-    (7, 'Board Game Collection', 'Collection of popular board games', 7, '2024-09-20 14:00:00', '2024-10-30 14:00:00', 100.00, 150.00, 120.00, 4, './images/4.jpg', 'active'),
-    (8, 'Digital Camera', 'High-end digital camera with accessories', 1, '2024-09-25 16:00:00', '2024-11-05 16:00:00', 600.00, 800.00, 700.00, 5, './images/5.jpg', 'active')
+    INSERT IGNORE INTO auction (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, highest_bid_id, image_url, status) VALUES
+    (1, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', 5, '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 180.00, NULL, './images/1.jpg', 'active'),
+    (2, 'Gaming Laptop', 'High-performance gaming laptop', 1, '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 950.00, NULL, './images/2.jpg', 'active'),
+    (3, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', 5, '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 7500.00, NULL, './images/3.jpg', 'ended'),
+    (4, 'Mountain Bike', 'Professional mountain bike, barely used', 4, '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 450.00, NULL, './images/4.jpg', 'active'),
+    (1, 'Designer Handbag', 'Limited edition designer handbag', 2, '2024-09-30 11:00:00', '2024-11-05 11:00:00', 1000.00, 1500.00, 1200.00, NULL, './images/5.jpg', 'active'),
+    (2, 'Smart Home Kit', 'Complete smart home automation kit', 3, '2024-10-05 13:00:00', '2024-11-10 13:00:00', 200.00, 300.00, 250.00, NULL, './images/6.jpg', 'active'),
+    (3, 'Classic Car', 'Restored classic car from the 1970s', 6, '2024-10-10 15:00:00', '2024-11-15 15:00:00', 15000.00, 20000.00, 18000.00, NULL, './images/7.jpg', 'active'),
+    (4, 'Rare Comic Book', 'First edition rare comic book', 5, '2024-10-15 10:00:00', '2024-11-20 10:00:00', 500.00, 1000.00, 800.00, NULL, './images/8.jpg', 'active'),
+    (5, 'Smartphone', 'Latest model smartphone', 1, '2024-10-20 09:00:00', '2024-11-25 09:00:00', 500.00, 700.00, 650.00, NULL, './images/9.jpg', 'active'),
+    (6, 'Leather Jacket', 'Vintage leather jacket', 2, '2024-10-25 11:00:00', '2024-11-30 11:00:00', 200.00, 300.00, 280.00, NULL, './images/10.jpg', 'active'),
+    (7, 'Gardening Tools Set', 'Complete set of gardening tools', 3, '2024-09-01 13:00:00', '2024-10-05 13:00:00', 150.00, 250.00, 200.00, NULL, './images/11.jpg', 'ended'),
+    (8, 'Tennis Racket', 'Professional tennis racket', 4, '2024-09-05 15:00:00', '2024-10-15 15:00:00', 100.00, 150.00, 130.00, NULL, './images/1.jpg', 'active'),
+    (5, 'Antique Clock', 'Rare antique clock from the 18th century', 5, '2024-09-10 10:00:00', '2024-10-20 10:00:00', 2000.00, 3000.00, 2500.00, NULL, './images/2.jpg', 'active'),
+    (6, 'Electric Scooter', 'Foldable electric scooter', 6, '2024-09-15 12:00:00', '2024-10-25 12:00:00', 300.00, 400.00, 350.00, NULL, './images/3.jpg', 'active'),
+    (7, 'Board Game Collection', 'Collection of popular board games', 7, '2024-09-20 14:00:00', '2024-10-30 14:00:00', 100.00, 150.00, 120.00, NULL, './images/4.jpg', 'active'),
+    (8, 'Digital Camera', 'High-end digital camera with accessories', 1, '2024-09-25 16:00:00', '2024-11-05 16:00:00', 600.00, 800.00, 700.00, NULL, './images/5.jpg', 'active')
     ");
     echo "Sample auctions inserted or already exist.\n";
 
@@ -207,6 +247,21 @@ try {
     echo "Sample transactions inserted or already exist.\n";
 
     echo "All sample data inserted successfully.\n";
+
+    // Create trigger for updating highest bid
+    $pdo->exec("
+    CREATE TRIGGER IF NOT EXISTS update_auction_after_bid
+    AFTER INSERT ON bid
+    FOR EACH ROW
+    BEGIN
+        UPDATE auction
+        SET highest_bid = NEW.bid_amount,
+            highest_bid_id = NEW.bid_id
+        WHERE auction_id = NEW.auction_id
+        AND (highest_bid IS NULL OR NEW.bid_amount > highest_bid);
+    END
+    ");
+    echo "Trigger for updating highest bid created or already exists.\n";
 
 } catch (PDOException $e) {
     // Output error message
