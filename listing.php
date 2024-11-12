@@ -79,8 +79,11 @@ $auction_id = isset($_GET['auction_id']) ? (int)$_GET['auction_id'] : 0;
 
 // Fetch auction details with watch count
 $stmt = $pdo->prepare("
-    SELECT a.*, u.username as seller_username, c.category_name,
+    SELECT a.*, 
+           u.username as seller_username, 
+           c.category_name,
            COUNT(DISTINCT b.bid_id) as num_bids,
+           COALESCE(MAX(b.bid_amount), a.starting_price) as current_price,
            (SELECT COUNT(*) FROM watchlist w WHERE w.auction_id = a.auction_id) as watch_count
     FROM auction a
     LEFT JOIN user u ON a.seller_id = u.user_id

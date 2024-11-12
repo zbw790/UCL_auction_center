@@ -12,11 +12,14 @@ $auction_id = (int)$_GET['auction_id'];
 
 try {
     $stmt = $pdo->prepare("
-        SELECT current_price, 
-               (SELECT COUNT(*) FROM bid WHERE auction_id = auction.auction_id) as num_bids,
-               (SELECT COUNT(*) FROM watchlist WHERE auction_id = auction.auction_id) as watch_count
-        FROM auction 
-        WHERE auction_id = ?
+        SELECT 
+            COALESCE(MAX(b.bid_amount), a.starting_price) as current_price,
+            COUNT(DISTINCT b.bid_id) as num_bids,
+            (SELECT COUNT(*) FROM watchlist w WHERE w.auction_id = a.auction_id) as watch_count
+        FROM auction a
+        LEFT JOIN bid b ON a.auction_id = b.auction_id
+        WHERE a.auction_id = ?
+        GROUP BY a.auction_id
     ");
     $stmt->execute([$auction_id]);
     $result = $stmt->fetch();

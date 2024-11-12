@@ -21,11 +21,16 @@ try {
     // Start transaction
     $pdo->beginTransaction();
     
-    // Get current auction info
+    // Get current auction info with the latest bid amount or starting price
     $stmt = $pdo->prepare("
-        SELECT current_price, end_date, seller_id
-        FROM auction
-        WHERE auction_id = ?
+        SELECT 
+            COALESCE(MAX(b.bid_amount), a.starting_price) as current_price,
+            a.end_date,
+            a.seller_id
+        FROM auction a
+        LEFT JOIN bid b ON a.auction_id = b.auction_id
+        WHERE a.auction_id = ?
+        GROUP BY a.auction_id
         FOR UPDATE
     ");
     $stmt->execute([$auction_id]);
