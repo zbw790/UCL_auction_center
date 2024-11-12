@@ -29,7 +29,7 @@ try {
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS user (
             user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            user_name VARCHAR(255) NOT NULL UNIQUE,
+            username VARCHAR(255) NOT NULL UNIQUE,
             email VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             registration_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -145,7 +145,7 @@ try {
 
     // Insert sample users with minimal required fields
     $pdo->exec("
-    INSERT IGNORE INTO user (user_name, email, password, registration_date) VALUES
+    INSERT IGNORE INTO user (username, email, password, registration_date) VALUES
     ('john_doe', 'john@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-01 10:00:00'),
     ('jane_smith', 'jane@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-02 11:30:00'),
     ('mike_wilson', 'mike@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-03 14:45:00'),
