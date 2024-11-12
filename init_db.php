@@ -130,6 +130,20 @@ try {
     ");
     echo "Private message table created or already exists.\n";
 
+    // Check and create watchlist table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS watchlist (
+            watchlist_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            user_id INT UNSIGNED NOT NULL,
+            auction_id INT UNSIGNED NOT NULL,
+            added_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES user(user_id),
+            FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
+            UNIQUE KEY unique_watch (user_id, auction_id)
+        )
+    ");
+    echo "Watchlist table created or already exists.\n";
+
     // Insert sample data into category table
     $pdo->exec("
         INSERT IGNORE INTO category (category_name) VALUES 
@@ -159,22 +173,22 @@ try {
     // Insert more sample auctions with varied end dates and prices
     $pdo->exec("
     INSERT IGNORE INTO auction (seller_id, category_id, item_name, description, start_date, end_date, starting_price, reserve_price, current_price, image_url, status) VALUES
-    (1, 5, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 100.00, './images/1.jpg', 'active'),
-    (2, 1, 'Gaming Laptop', 'High-performance gaming laptop', '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 800.00, './images/2.jpg', 'active'),
-    (3, 5, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 5000.00, './images/3.jpg', 'active'),
-    (4, 4, 'Mountain Bike', 'Professional mountain bike, barely used', '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 300.00, './images/4.jpg', 'active'),
-    (1, 2, 'Designer Handbag', 'Limited edition designer handbag', '2024-09-30 11:00:00', '2024-11-05 11:00:00', 1000.00, 1500.00, 1000.00, './images/5.jpg', 'active'),
-    (2, 3, 'Smart Home Kit', 'Complete smart home automation kit', '2024-10-05 13:00:00', '2024-11-10 13:00:00', 200.00, 300.00, 200.00, './images/6.jpg', 'active'),
-    (3, 6, 'Classic Car', 'Restored classic car from the 1970s', '2024-10-10 15:00:00', '2024-11-15 15:00:00', 15000.00, 20000.00, 15000.00, './images/7.jpg', 'active'),
-    (4, 5, 'Rare Comic Book', 'First edition rare comic book', '2024-10-15 10:00:00', '2024-11-20 10:00:00', 500.00, 1000.00, 500.00, './images/8.jpg', 'active'),
-    (5, 1, 'Smartphone', 'Latest model smartphone', '2024-10-20 09:00:00', '2024-11-25 09:00:00', 500.00, 700.00, 500.00, './images/9.jpg', 'active'),
-    (6, 2, 'Leather Jacket', 'Vintage leather jacket', '2024-10-25 11:00:00', '2024-11-30 11:00:00', 200.00, 300.00, 200.00, './images/10.jpg', 'active'),
-    (7, 3, 'Gardening Tools Set', 'Complete set of gardening tools', '2024-09-01 13:00:00', '2024-10-05 13:00:00', 150.00, 250.00, 150.00, './images/11.jpg', 'ended'),
-    (8, 4, 'Tennis Racket', 'Professional tennis racket', '2024-09-05 15:00:00', '2024-10-15 15:00:00', 100.00, 150.00, 100.00, './images/1.jpg', 'active'),
-    (5, 5, 'Antique Clock', 'Rare antique clock from the 18th century', '2024-09-10 10:00:00', '2024-10-20 10:00:00', 2000.00, 3000.00, 2000.00, './images/2.jpg', 'active'),
-    (6, 6, 'Electric Scooter', 'Foldable electric scooter', '2024-09-15 12:00:00', '2024-10-25 12:00:00', 300.00, 400.00, 300.00, './images/3.jpg', 'active'),
-    (7, 7, 'Board Game Collection', 'Collection of popular board games', '2024-09-20 14:00:00', '2024-10-30 14:00:00', 100.00, 150.00, 100.00, './images/4.jpg', 'active'),
-    (8, 1, 'Digital Camera', 'High-end digital camera with accessories', '2024-09-25 16:00:00', '2024-11-05 16:00:00', 600.00, 800.00, 600.00, './images/5.jpg', 'active')
+    (1, 5, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', '2024-11-01 12:00:00', '2024-12-01 12:00:00', 100.00, 200.00, 100.00, './images/1.jpg', 'active'),
+    (2, 1, 'Gaming Laptop', 'High-performance gaming laptop', '2024-11-05 10:00:00', '2024-12-05 10:00:00', 800.00, 1000.00, 800.00, './images/2.jpg', 'active'),
+    (3, 5, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', '2024-11-08 14:00:00', '2024-12-08 14:00:00', 5000.00, 8000.00, 5000.00, './images/3.jpg', 'active'),
+    (4, 4, 'Mountain Bike', 'Professional mountain bike, barely used', '2024-11-10 09:00:00', '2024-12-10 09:00:00', 300.00, 500.00, 300.00, './images/4.jpg', 'active'),
+    (1, 2, 'Designer Handbag', 'Limited edition designer handbag', '2024-11-15 11:00:00', '2024-12-15 11:00:00', 1000.00, 1500.00, 1000.00, './images/5.jpg', 'active'),
+    (2, 3, 'Smart Home Kit', 'Complete smart home automation kit', '2024-11-18 13:00:00', '2024-12-18 13:00:00', 200.00, 300.00, 200.00, './images/6.jpg', 'active'),
+    (3, 6, 'Classic Car', 'Restored classic car from the 1970s', '2024-11-20 15:00:00', '2024-12-20 15:00:00', 15000.00, 20000.00, 15000.00, './images/7.jpg', 'active'),
+    (4, 5, 'Rare Comic Book', 'First edition rare comic book', '2024-11-25 10:00:00', '2024-12-25 10:00:00', 500.00, 1000.00, 500.00, './images/8.jpg', 'active'),
+    (5, 1, 'Smartphone', 'Latest model smartphone', '2024-11-28 09:00:00', '2024-12-28 09:00:00', 500.00, 700.00, 500.00, './images/9.jpg', 'active'),
+    (6, 2, 'Leather Jacket', 'Vintage leather jacket', '2024-12-01 11:00:00', '2024-12-31 11:00:00', 200.00, 300.00, 200.00, './images/10.jpg', 'active'),
+    (7, 3, 'Gardening Tools Set', 'Complete set of gardening tools', '2024-10-01 13:00:00', '2024-11-01 13:00:00', 150.00, 250.00, 150.00, './images/11.jpg', 'ended'),
+    (8, 4, 'Tennis Racket', 'Professional tennis racket', '2024-11-05 15:00:00', '2024-12-05 15:00:00', 100.00, 150.00, 100.00, './images/1.jpg', 'active'),
+    (5, 5, 'Antique Clock', 'Rare antique clock from the 18th century', '2024-11-10 10:00:00', '2024-12-10 10:00:00', 2000.00, 3000.00, 2000.00, './images/2.jpg', 'active'),
+    (6, 6, 'Electric Scooter', 'Foldable electric scooter', '2024-11-15 12:00:00', '2024-12-15 12:00:00', 300.00, 400.00, 300.00, './images/3.jpg', 'active'),
+    (7, 7, 'Board Game Collection', 'Collection of popular board games', '2024-11-20 14:00:00', '2024-12-20 14:00:00', 100.00, 150.00, 100.00, './images/4.jpg', 'active'),
+    (8, 1, 'Digital Camera', 'High-end digital camera with accessories', '2024-11-25 16:00:00', '2024-12-25 16:00:00', 600.00, 800.00, 600.00, './images/5.jpg', 'active')
     ");
 
     // Insert sample bids with realistic bid progression
