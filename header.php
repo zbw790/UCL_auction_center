@@ -23,48 +23,64 @@ if (!isset($_SESSION['logged_in'])) {
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light mx-2">
-  <a class="navbar-brand" href="#">My Auction Site</a>
-  <ul class="navbar-nav ms-auto">
-    <li class="nav-item">
-      <?php
-      if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-        echo '<a class="nav-link" href="logout.php">Logout</a>';
-      } else {
-        echo '<button type="button" class="btn nav-link" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>';
-      }
-      ?>
-    </li>
-  </ul>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#">My Auction Site</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="browse.php">Browse</a>
+        </li>
+        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="mybids.php">My Bids</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="recommendations.php">Recommended</a>
+          </li>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer'): ?>
+          <li class="nav-item">
+            <a class="nav-link" href="mylistings.php">My Listings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="create_auction.php">Create Auction</a>
+          </li>
+        <?php endif; ?>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle"></i> 
+            <?php 
+            if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+              echo 'Hello ' . htmlspecialchars($_SESSION['username']) . '!';
+            } else {
+              echo 'Please login';
+            }
+            ?>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
+              <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+            <?php else: ?>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+              <li><a class="dropdown-item" href="register.php">Register</a></li>
+            <?php endif; ?>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <ul class="navbar-nav align-middle">
-    <li class="nav-item mx-1">
-      <a class="nav-link" href="browse.php">Browse</a>
-    </li>
-    <?php
-    if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer') {
-      echo('
-      <li class="nav-item mx-1">
-        <a class="nav-link" href="mybids.php">My Bids</a>
-      </li>
-      <li class="nav-item mx-1">
-        <a class="nav-link" href="recommendations.php">Recommended</a>
-      </li>');
-    }
-    if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller') {
-      echo('
-      <li class="nav-item mx-1">
-        <a class="nav-link" href="mylistings.php">My Listings</a>
-      </li>
-      <li class="nav-item ml-3">
-        <a class="nav-link btn border-light" href="create_auction.php">+ Create auction</a>
-      </li>');
-    }
-    ?>
-  </ul>
-</nav>
+
+
 
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog">

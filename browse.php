@@ -39,7 +39,7 @@
             <a class="nav-link" href="recommendations.php">Recommended</a>
           </li>
         <?php endif; ?>
-        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller'): ?>
+        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer'): ?>
           <li class="nav-item">
             <a class="nav-link" href="mylistings.php">My Listings</a>
           </li>

@@ -3,6 +3,45 @@
 <div class="container my-5">
 
 <?php
+require './db_connect.php';
+
+if (isset($_POST['submit_auction'])){
+    $auction_title = trim($_POST['auction_title']);
+    $category_id = (int)$_POST['category'];
+    $details = trim($_POST['details']);
+    $start_price = (int)$_POST['start_price'];
+    $reserve_price = (int)$_POST['reserve_price'];
+    $start_date = $_POST['start_date'];
+    $end_date = $_POST['end_date'];
+    $img_url = rand() . $_FILES["image"]["name"];
+	move_uploaded_file($_FILES["image"]["tmp_name"],"./image".$img_url);
+    
+    $user_id = $_SESSION['user_id'];
+
+    $stmt = $pdo->prepare("
+        INSERT INTO auction (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, image_url)
+        VALUES (:seller_id, :item_name, :description, :category_id, :start_date, :end_date, :starting_price, :reserve_price, :image_url)
+     ");
+    
+    $stmt->execute([
+         ':seller_id' => $user_id,
+         ':item_name' => $auction_title,
+         ':description' => $details,
+         ':category_id' => $category_id,
+         ':start_date' => $start_date,
+         ':end_date' => $end_date,
+         ':starting_price' => $start_price,
+         ':reserve_price' => $reserve_price,
+         ':image_url' => $img_url
+     ]);
+     $auction_id = $pdo->lastInsertId();
+                
+}
+
+
+
+
+
 
 // This function takes the form data and adds the new auction to the database.
 

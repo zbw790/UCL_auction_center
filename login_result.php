@@ -9,8 +9,6 @@ session_start();
 $_SESSION['logged_in'] = true;
 $_SESSION['username'] = "test";
 $_SESSION['account_type'] = "buyer";
-
-
 header("Location: browse.php");
 
 ?>
