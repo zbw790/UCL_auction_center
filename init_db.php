@@ -173,7 +173,7 @@ try {
     // Insert more sample auctions with varied end dates and prices
     $pdo->exec("
     INSERT IGNORE INTO auction (seller_id, category_id, item_name, description, start_date, end_date, starting_price, reserve_price, current_price, image_url, status) VALUES
-    (1, 5, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', '2024-11-01 12:00:00', '2024-12-01 12:00:00', 100.00, 200.00, 100.00, './images/1.jpg', 'active'),
+    (1, 5, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', '2024-11-01 12:00:00', '2024-11-15 12:00:00', 100.00, 200.00, 100.00, './images/1.jpg', 'active'),
     (2, 1, 'Gaming Laptop', 'High-performance gaming laptop', '2024-11-05 10:00:00', '2024-12-05 10:00:00', 800.00, 1000.00, 800.00, './images/2.jpg', 'active'),
     (3, 5, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', '2024-11-08 14:00:00', '2024-12-08 14:00:00', 5000.00, 8000.00, 5000.00, './images/3.jpg', 'active'),
     (4, 4, 'Mountain Bike', 'Professional mountain bike, barely used', '2024-11-10 09:00:00', '2024-12-10 09:00:00', 300.00, 500.00, 300.00, './images/4.jpg', 'active'),
