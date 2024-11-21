@@ -1,14 +1,43 @@
 <?php
-
-// TODO: Extract $_POST variables, check they're OK, and attempt to login.
-// Notify user of success/failure and redirect/give navigation options.
-
-// For now, I will just set session variables and redirect.
-
 session_start();
-$_SESSION['logged_in'] = true;
-$_SESSION['username'] = "test";
-$_SESSION['account_type'] = "buyer";
-header("Location: browse.php");
 
+require_once 'db_connect.php';
+
+// 获取表单提交的数据
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
+
+// 基本输入验证
+if(empty($email) || empty($password)) {
+    $_SESSION['error'] = "Please fill in all fields";
+    header("Location: browse.php");
+    exit();
+}
+
+try {
+    // 准备SQL语句，防止SQL注入
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    // 检查用户是否存在并验证密码
+    if($user && password_verify($password, $user['password'])) {
+        // 登录成功
+        $_SESSION['logged_in'] = true;
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['username'] = $user['username'];
+        
+        header("Location: browse.php");
+        exit();
+    } else {
+        // 登录失败
+        $_SESSION['error'] = "Invalid email or password";
+        header("Location: browse.php");
+        exit();
+    }
+} catch(PDOException $e) {
+    $_SESSION['error'] = "Login failed: " . $e->getMessage();
+    header("Location: browse.php");
+    exit();
+}
 ?>
