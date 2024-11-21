@@ -25,18 +25,13 @@
         <li class="nav-item">
           <a class="nav-link" href="browse.php">Browse</a>
         </li>
-        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer'): ?>
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
           <li class="nav-item">
             <a class="nav-link" href="mybids.php">My Bids</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="watchlist.php">Watchlist</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="recommendations.php">Recommended</a>
-          </li>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller'): ?>
           <li class="nav-item">
             <a class="nav-link" href="mylistings.php">My Listings</a>
           </li>
