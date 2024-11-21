@@ -76,6 +76,16 @@
   </div>
 </nav>
 
+<?php
+if(isset($_SESSION['error'])) {
+    echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+            ' . htmlspecialchars($_SESSION['error']) . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+    unset($_SESSION['error']);
+}
+?>
+
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
