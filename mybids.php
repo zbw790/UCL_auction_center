@@ -4,6 +4,8 @@
 
 <div class="container">
 
+
+
 <h2 class="my-3">My bids</h2>
 
   <div class="container main-content">
@@ -139,13 +141,16 @@
   }
     ?>
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
       <?php if (empty($auctions)): ?>
+          <div class="col-12 text-center">
+              <p class="lead">No active auctions match your search. Try different criteria!</p>
+          </div>
+      <?php else: ?>
           <?php foreach ($auctions as $auction): ?>
               <div class="col" data-aos="fade-up">
                   <div class="card auction-card h-100 shadow-sm hover-effect">
                       <a href="listing.php?auction_id=<?php echo $auction['auction_id']; ?>" class="text-decoration-none">
-
                           <div class="card-body">
                               <h5 class="card-title text-primary mb-3"><?php echo htmlspecialchars($auction['item_name']); ?></h5>
                               <p class="card-text text-muted mb-3"><?php echo substr(htmlspecialchars($auction['description']), 0, 100); ?>...</p>
