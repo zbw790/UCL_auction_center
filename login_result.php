@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require_once 'db_connect.php';
 
 // 获取表单提交的数据
