@@ -32,7 +32,7 @@ try {
     $start_date = new DateTime($auction['start_date']);
     $end_date = new DateTime($auction['end_date']);
 
-    // 如果当前时间超过了拍卖结束时间
+    
     if ($now >= $end_date && $auction['status'] == 'active') {
         // 先将拍卖状态更新为 ended
         $stmt = $pdo->prepare("UPDATE auction SET status = 'ended' WHERE auction_id = ?");
