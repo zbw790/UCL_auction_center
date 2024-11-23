@@ -113,9 +113,12 @@
 
   // Calculate time remaining
   $now = new DateTime();
+  $start_date = new DateTime($auction['start_date']);
   $end_date = new DateTime($auction['end_date']);
   $time_remaining = $now < $end_date ? $end_date->diff($now) : null;
-  $bid_disabled = $now >= $end_date; // 如果当前时间超过结束时间，则禁用竞标按钮
+
+  // 只有当拍卖状态为 active 且当前时间小于结束时间时，允许竞标
+  $bid_disabled = $auction['status'] != 'active' || $now >= $end_date;
   ?>
 
   <div class="container mt-4">
@@ -182,7 +185,7 @@
               <p class="text-muted"><span id="num-bids"><?php echo $auction['num_bids']; ?></span> bids</p>
             </div>
 
-            <?php if ($now < $end_date && isset($_SESSION['logged_in'])): ?>
+            <?php if (!$bid_disabled && isset($_SESSION['logged_in'])): ?>
               <form id="bid-form" class="mb-3">
                 <div class="input-group mb-3">
                   <span class="input-group-text">$</span>
@@ -325,17 +328,29 @@
     // Update price every 5 seconds
     setInterval(updatePriceAndBids, 5000);
 
-    // Function to update time remaining
+    // Update time remaining every second
     function updateTimeRemaining() {
       const endDate = new Date('<?php echo $auction['end_date']; ?>');
       const now = new Date();
       const diff = endDate - now;
 
       if (diff <= 0) {
-        $('#time-remaining').closest('.countdown-timer').parent().html(
-          '<div class="alert alert-secondary">This auction has ended</div>'
-        );
-        $('#bid-form').remove(); // 禁用竞标表单
+        // 倒计时结束，通知服务器更新拍卖状态
+        $.ajax({
+          url: 'update_auction_status.php', // 新增的后端接口，用于处理拍卖结束状态
+          type: 'POST',
+          data: {
+            auction_id: <?php echo $auction_id; ?>
+          },
+          success: function(response) {
+            if (response.success) {
+              $('#time-remaining').closest('.countdown-timer').parent().html(
+                '<div class="alert alert-secondary">This auction has ended</div>'
+              );
+              $('#bid-form').remove(); // 禁用竞标表单
+            }
+          }
+        });
         return;
       }
 
@@ -349,7 +364,7 @@
     }
 
     // Update time remaining every minute
-    setInterval(updateTimeRemaining, 60000);
+    setInterval(updateTimeRemaining, 1000); //update every second
 
     function toggleWatchlist(auctionId, adding) {
       $.ajax({
