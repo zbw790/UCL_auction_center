@@ -115,7 +115,7 @@
   $now = new DateTime();
   $start_date = new DateTime($auction['start_date']);
   $end_date = new DateTime($auction['end_date']);
-  $time_remaining = $now < $end_date ? $end_date->diff($now) : null;
+  $time_remaining = $now < $end_date ? $end_date->diff($now) : null; //按钮？
 
   // 只有当拍卖状态为 active 且当前时间小于结束时间时，允许竞标
   $bid_disabled = $auction['status'] != 'active' || $now >= $end_date;
@@ -156,65 +156,65 @@
         </div>
       </div>
 
-      <!-- Right Column -->
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <div class="text-center mb-3">
-              <?php if ($now < $end_date): ?>
-                <div class="countdown-timer mb-3">
-                  <h5>Time remaining:</h5>
-                  <strong id="time-remaining">
-                    <?php
-                    if ($time_remaining) {
-                      echo display_time_remaining($time_remaining);
-                    }
-                    ?>
-                  </strong>
-                </div>
-              <?php else: ?>
-                <div class="alert alert-secondary">
-                  This auction has ended
-                </div>
-              <?php endif; ?>
-            </div>
-
-            <div class="price-info text-center mb-4">
-              <h3>Current Price</h3>
-              <h2 class="text-primary">$<span id="current-price"><?php echo number_format($auction['current_price'], 2); ?></span></h2>
-              <p class="text-muted"><span id="num-bids"><?php echo $auction['num_bids']; ?></span> bids</p>
-            </div>
-
-            <?php if (!$bid_disabled && isset($_SESSION['logged_in'])): ?>
-              <form id="bid-form" class="mb-3">
-                <div class="input-group mb-3">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control" id="bid-amount"
-                    min="<?php echo $auction['current_price'] + 0.01; ?>"
-                    step="0.01" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Place Bid</button>
-              </form>
-            <?php elseif (!isset($_SESSION['logged_in'])): ?>
-              <div class="alert alert-info text-center">
-                Please <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">login</a> to place a bid
+    <!-- Right Column -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <?php if ($now < $end_date): ?>
+              <div class="countdown-timer mb-3">
+                <h5>Time remaining:</h5>
+                <strong id="time-remaining">
+                  <?php
+                  if ($time_remaining) {
+                    echo display_time_remaining($time_remaining);
+                  }
+                  ?>
+                </strong>
               </div>
             <?php else: ?>
-              <div class="alert alert-secondary text-center">
-                Bidding has ended for this auction
+              <div class="alert alert-secondary">
+                This auction has ended
               </div>
             <?php endif; ?>
           </div>
+
+          <div class="price-info text-center mb-4">
+            <h3>Current Price</h3>
+            <h2 class="text-primary">$<span id="current-price"><?php echo number_format($auction['current_price'], 2); ?></span></h2>
+            <p class="text-muted"><span id="num-bids"><?php echo $auction['num_bids']; ?></span> bids</p>
+          </div>
+
+          <?php if (!$bid_disabled && isset($_SESSION['logged_in'])): ?>
+            <form id="bid-form" class="mb-3">
+              <div class="input-group mb-3">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="bid-amount"
+                  min="<?php echo $auction['current_price'] + 0.01; ?>"
+                  step="0.01" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Place Bid</button>
+            </form>
+          <?php elseif (!isset($_SESSION['logged_in'])): ?>
+            <div class="alert alert-info text-center">
+              Please <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">login</a> to place a bid
+            </div>
+          <?php else: ?>
+            <div class="alert alert-secondary text-center">
+              Bidding has ended for this auction
+            </div>
+          <?php endif; ?>
         </div>
+      </div>
 
 
-        <!-- Recent Bids Section -->
-        <div class="card shadow-sm mt-3">
-          <div class="card-body">
-            <h5 class="card-title">Recent Bids</h5>
-            <div id="recent-bids">
-              <?php
-              $stmt = $pdo->prepare("
+      <!-- Recent Bids Section -->
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="card-title">Recent Bids</h5>
+          <div id="recent-bids">
+            <?php
+            $stmt = $pdo->prepare("
                             SELECT b.bid_amount, b.bid_date, u.username
                             FROM bid b
                             JOIN user u ON b.user_id = u.user_id
@@ -222,32 +222,32 @@
                             ORDER BY b.bid_date DESC
                             LIMIT 5
                         ");
-              $stmt->execute([$auction_id]);
-              $recent_bids = $stmt->fetchAll();
-              ?>
+            $stmt->execute([$auction_id]);
+            $recent_bids = $stmt->fetchAll();
+            ?>
 
-              <?php if ($recent_bids): ?>
-                <ul class="list-group list-group-flush">
-                  <?php foreach ($recent_bids as $bid): ?>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <span class="badge bg-primary rounded-pill">$<?php echo number_format($bid['bid_amount'], 2); ?></span>
-                        by <?php echo htmlspecialchars($bid['username']); ?>
-                      </div>
-                      <small class="text-muted">
-                        <?php echo (new DateTime($bid['bid_date']))->format('M d, H:i'); ?>
-                      </small>
-                    </li>
-                  <?php endforeach; ?>
-                </ul>
-              <?php else: ?>
-                <p class="text-muted text-center">No bids yet</p>
-              <?php endif; ?>
-            </div>
+            <?php if ($recent_bids): ?>
+              <ul class="list-group list-group-flush">
+                <?php foreach ($recent_bids as $bid): ?>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="badge bg-primary rounded-pill">$<?php echo number_format($bid['bid_amount'], 2); ?></span>
+                      by <?php echo htmlspecialchars($bid['username']); ?>
+                    </div>
+                    <small class="text-muted">
+                      <?php echo (new DateTime($bid['bid_date']))->format('M d, H:i'); ?>
+                    </small>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            <?php else: ?>
+              <p class="text-muted text-center">No bids yet</p>
+            <?php endif; ?>
           </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- Footer -->
@@ -326,42 +326,89 @@
     }
 
     // Update price every 5 seconds
-    setInterval(updatePriceAndBids, 5000);
+    setInterval(updatePriceAndBids, 1000); //every 1 second
+
+    // 更新服务器时间的函数
+    function fetchServerTime() {
+      return $.ajax({
+        url: 'server_time.php', // 这个 PHP 文件返回当前服务器时间
+        type: 'GET',
+        dataType: 'json'
+      });
+    }
 
     // Update time remaining every second
+    // 更新剩余时间的函数
     function updateTimeRemaining() {
-      const endDate = new Date('<?php echo $auction['end_date']; ?>');
-      const now = new Date();
-      const diff = endDate - now;
+      // 通过 AJAX 获取服务器时间
+      fetchServerTime().done(function(response) {
+        if (response.success) {
+          // 使用服务器时间计算剩余时间
+          const serverTime = new Date(response.server_time);
+          const startDate = new Date('<?php echo $auction['start_date']; ?>');
+          const endDate = new Date('<?php echo $auction['end_date']; ?>');
 
-      if (diff <= 0) {
-        // 倒计时结束，通知服务器更新拍卖状态
-        $.ajax({
-          url: 'update_auction_status.php', // 新增的后端接口，用于处理拍卖结束状态
-          type: 'POST',
-          data: {
-            auction_id: <?php echo $auction_id; ?>
-          },
-          success: function(response) {
-            if (response.success) {
-              $('#time-remaining').closest('.countdown-timer').parent().html(
-                '<div class="alert alert-secondary">This auction has ended</div>'
-              );
-              $('#bid-form').remove(); // 禁用竞标表单
-            }
+          // 如果拍卖还未开始，显示拍卖未开始的信息
+          if (serverTime < startDate) {
+            $('#time-remaining').closest('.countdown-timer').parent().html(
+              '<div class="alert alert-secondary">This auction has not started yet</div>'
+            );
+            $('#bid-form').remove(); // 禁用竞标表单
+            return;
           }
-        });
-        return;
-      }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const diff = endDate - serverTime;
 
-      $('#time-remaining').text(
-        days + ' days, ' + hours + ' hours, ' + minutes + ' minutes'
-      );
+          // 如果倒计时结束，通知服务器更新拍卖状态
+          if (diff <= 0) {
+            $.ajax({
+              url: 'update_auction_status.php', // 新增的后端接口，用于处理拍卖结束状态
+              type: 'POST',
+              data: {
+                auction_id: <?php echo $auction_id; ?>
+              },
+              success: function(response) {
+                if (response.success) {
+                  $('#time-remaining').closest('.countdown-timer').parent().html(
+                    '<div class="alert alert-secondary">This auction has ended</div>'
+                  );
+                  $('#bid-form').remove(); // 禁用竞标表单
+                }
+              }
+            });
+            return;
+          }
+
+          // 更精确地计算剩余时间
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / (60 * 60 * 24));
+          const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+          const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+          const seconds = totalSeconds % 60;
+
+          // 更新倒计时显示
+          $('#time-remaining').text(
+            `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`
+          );
+
+          // 如果倒计时低于10秒，增加刷新频率
+          if (totalSeconds <= 10) {
+            clearInterval(updateInterval);
+            updateInterval = setInterval(updateTimeRemaining, 200); // 每 200 毫秒更新一次
+          }
+
+          // 如果倒计时结束，禁用竞标按钮（双重保险）
+          if (serverTime >= endDate) {
+            $('#bid-form').remove(); // 移除竞标表单
+            $('#time-remaining').closest('.countdown-timer').parent().html(
+              '<div class="alert alert-secondary">This auction has ended</div>'
+            );
+          }
+        }
+      });
     }
+
+
 
     // Update time remaining every minute
     setInterval(updateTimeRemaining, 1000); //update every second
