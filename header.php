@@ -22,7 +22,7 @@ if (!isset($_SESSION['logged_in'])) {
 </head>
 
 <body>
-
+  
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
     <a class="navbar-brand" href="#">My Auction Site</a>
@@ -74,8 +74,28 @@ if (!isset($_SESSION['logged_in'])) {
   </div>
 </nav>
 
-
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <ul class="navbar-nav align-middle">
+    <li class="nav-item mx-1">
+      <a class="nav-link" href="browse.php">Browse</a>
+    </li>
+    <?php
+    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+      // 所有登录用户都可以看到这些选项
+      echo('
+      <li class="nav-item mx-1">
+        <a class="nav-link" href="mybids.php">My Bids</a>
+      </li>
+      <li class="nav-item mx-1">
+        <a class="nav-link" href="mylistings.php">My Listings</a>
+      </li>
+      <li class="nav-item ml-3">
+        <a class="nav-link btn border-light" href="create_auction.php">+ Create auction</a>
+      </li>');
+    }
+    ?>
+  </ul>
+</nav>
 
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog">
