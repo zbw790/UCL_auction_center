@@ -3,7 +3,7 @@
 $host = 'localhost';
 $db = 'ucl_auction_center';
 $root_user = 'root';
-$root_pass = '';
+$root_pass = 'root';
 $auction_user = 'auction_user';
 $auction_pass = 'password';
 
