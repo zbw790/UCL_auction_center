@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-echo 'hello'；
+echo 'hi';
 // Query to fetch the auctions the user has bid on
 $query = "SELECT a.auction_id, 
                  a.item_name, 
