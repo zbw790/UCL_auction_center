@@ -131,8 +131,18 @@
               <h2 class="card-title mb-0"><?php echo htmlspecialchars($auction['item_name']); ?></h2>
               <?php if (isset($_SESSION['logged_in']) && $now < $end_date): ?>
                 <div id="watchlist-buttons" class="text-end">
-                  <!-- Watchlist buttons -->
-                </div>
+                  <button id="watch-btn" class="btn btn-outline-primary <?php echo $watching ? 'd-none' : ''; ?>"
+                          onclick="toggleWatchlist(<?php echo $auction_id; ?>, true)">
+                      <i class="far fa-star"></i> Add to Watchlist
+                  </button>
+                  <button id="unwatch-btn" class="btn btn-primary <?php echo !$watching ? 'd-none' : ''; ?>"
+                          onclick="toggleWatchlist(<?php echo $auction_id; ?>, false)">
+                      <i class="fas fa-star"></i> Watching
+                  </button>
+                  <div class="text-muted mt-2">
+                      <small><span id="watch-count"><?php echo $auction['watch_count']; ?></span> people watching</small>
+                  </div>
+</div>
               <?php endif; ?>
             </div>
 

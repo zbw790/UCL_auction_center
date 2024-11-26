@@ -44,6 +44,9 @@ if (!isset($_SESSION['logged_in'])) {
           <li class="nav-item">
             <a class="nav-link" href="create_auction.php">Create Auction</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="watchlist.php">WatchList</a>
+          </li>
         <?php endif; ?>
       </ul>
       <ul class="navbar-nav">
