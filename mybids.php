@@ -10,11 +10,10 @@
         header('Location: login.php');
         exit();
     }
-
-    $user_id = $_SESSION['user_id'];
-
-    // Query to fetch the auctions the user has bid on
-    $query = "SELECT a.auction_id, 
+  
+$user_id = $_SESSION['user_id'];
+// Query to fetch the auctions the user has bid on
+$query = "SELECT a.auction_id, 
                  a.item_name, 
                  a.description, 
                  COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price, 

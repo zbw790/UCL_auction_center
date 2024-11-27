@@ -26,8 +26,7 @@ if (isset($_GET['delete_id'])) {
   <h2 class="my-3">My listings</h2>
   
   <div class="checkout-left">  
-
-    <div class="col-md-12 ">
+     <div class="col-md-12 ">
       <table id="datatable" class="table table-striped table-bordered dataTable" role="grid" aria-describedby="example_info">            
         <thead>
           <tr>  
@@ -67,14 +66,12 @@ if (isset($_GET['delete_id'])) {
                   <td>".htmlspecialchars($rows['item_name'])."</td>";
             echo "<td>".htmlspecialchars($rows['category_name'])."</td>";
             echo "<td>".$bidCount."</td>";
-            
-            // Display the last bid or starting price
             if ($bidCount >= 1) {
                echo "<td>".htmlspecialchars($rows['highest_bid_price'])."</td>";
             } else {
                echo "<td>".htmlspecialchars($rows['starting_price'])."</td>";
             }
-
+          
             // Display auction period (start date and end date)
             echo "<td>". date("d/m/Y h:i A",strtotime($rows['start_date'])) . " -".  date("d/m/Y h:i A",strtotime($rows['end_date'])) . "</td>";
             echo "<td>".htmlspecialchars($rows['reserve_price'])."</td>";
@@ -127,15 +124,18 @@ if (isset($_GET['delete_id'])) {
   
 </div>
 </div>
-
 <script>
-    function deleteconfirm() {
-        if (confirm("Are you sure you want to remove this item from your listings? This action is irreversible.") == true) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-</script>
+	function deleteconfirm()
+	{
+		if(confirm("Are you sure you want to remove this item from your listings? This action is irreversible.") == true)
+		{
+			return  true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	</script>
 
 <?php include_once("footer.php")?>

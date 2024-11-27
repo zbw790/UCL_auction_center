@@ -161,5 +161,4 @@ $category = $stmt->fetchAll(PDO::FETCH_ASSOC);
     });
     //-------------------------------------//
 </script>
-
 <?php include_once("footer.php") ?>

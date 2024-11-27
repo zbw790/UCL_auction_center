@@ -151,3 +151,26 @@ body {
   position: relative;
   z-index: 3;
 }
+
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card a:hover {
+  text-decoration: none;
+}
+
+/* 确保移除按钮在卡片上层 */
+.card .btn-danger {
+  z-index: 2;
+}
