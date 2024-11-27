@@ -1,10 +1,6 @@
 <?php 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 include_once("header.php");
-require_once('init.php');
+require_once('db_connect.php');
 require_once('utilities.php');
 
 $auction = null;
@@ -25,7 +21,8 @@ if (isset($_POST['submit'])) {
             empty($_POST['start_price']) || empty($_POST['start_date']) || 
             empty($_POST['end_date']) || empty($_POST['details'])) {
                 if (empty($_POST['edit_id'])) {
-                throw new Exception("Please fill in all required fields");
+                    echo ('<div class="alert alert-danger">Failed to create auction: Please fill in all required fields.</div>');
+                    exit();
                 }
         }
 
@@ -39,7 +36,8 @@ if (isset($_POST['submit'])) {
             if (isset($_POST['end_date']) && !empty($_POST['end_date'])) {
                 $new_end_date = new DateTime($_POST['end_date']);
                 if ($new_end_date <= $start_date) {
-                    throw new Exception("End date must be after start date");
+                    echo ('<div class="alert alert-danger">Failed to modify auction: End date must be after start date.</div>');
+                    exit();
                 }
             }
 
@@ -50,11 +48,13 @@ if (isset($_POST['submit'])) {
             $now = new DateTime();
         
             if ($start_date < $now) {
-                throw new Exception("Start date must be in the future");
+               echo ('<div class="alert alert-danger">Failed to create auction: Start date must be in the future.</div>');
+               exit();
             }
         
             if ($end_date <= $start_date) {
-                throw new Exception("End date must be after start date");
+               echo ('<div class="alert alert-danger">Failed to create auction: End date must be after start date.</div>');
+               exit();
             }
         }
 
@@ -66,13 +66,51 @@ if (isset($_POST['submit'])) {
         $reserve_price = !empty($_POST['reserve_price']) ? (float)$_POST['reserve_price'] : null;
         
         if ($start_price <= 0) {
-            throw new Exception("Starting price must be greater than 0");
+            echo ('<div class="alert alert-danger">Starting price must be greater than 0.</div>');
+            exit();
         }
 
         if ($reserve_price !== null && $reserve_price < $start_price) {
-            throw new Exception("Reserve price cannot be less than starting price");
+            echo ('<div class="alert alert-danger">Reserve price cannot be less than starting price.</div>');
+            exit();
         }
         
+        // Process uploaded image(if there are new images)
+       if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = "./images/";
+        if (!file_exists($target_dir)) {
+            if (!mkdir($target_dir, 0777, true)) {
+                echo ('<div class="alert alert-danger">Failed to create images directory.</div>');
+                exit();
+            }
+        }
+
+        $img_url = time() . '_' . basename($_FILES["image"]["name"]);
+        $target_file = $target_dir . $img_url;
+
+        // Check if the uploaded file is image format
+        $check = getimagesize($_FILES["image"]["tmp_name"]);
+        if ($check === false) {
+            echo ('<div class="alert alert-danger">File is not an image.</div>');
+            exit();
+        }
+
+        // Moving image to 'images/'
+        if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+            echo ('<div class="alert alert-danger">Failed to upload image.</div>');
+            exit();
+        }
+
+        $img_url = 'images/' . $img_url;
+    } else {
+        // Editor can choose upload new image or keep the original image
+        // Image must be upload if user create new auction
+        if (isset($_POST['edit_id']) && !empty($_POST['edit_id'])&& isset($auction)) {
+            $img_url = $auction['image_url'] ?? null;
+        } else {
+            $img_url = null;
+        }
+    }
         $user_id = $_SESSION['user_id'];
         //Modify created auction's information and update them in database
         if (isset($_POST['edit_id']) && $_POST['edit_id'] != '') {
