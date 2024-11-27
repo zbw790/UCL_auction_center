@@ -20,7 +20,6 @@
 
 <body>
 
-
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
       <a class="navbar-brand" href="#">My Auction Site</a>
@@ -40,9 +39,11 @@
               <a class="nav-link" href="mylistings.php">My Listings</a>
             </li>
             <li class="nav-item">
-              <!--!!!!!!! 这里改为了fixed_create_auction.php!!!!!!!!-->
-              <a class="nav-link" href="fixed_create_auction.php">Create Auction</a>
+              <a class="nav-link" href="create_auction.php">Create Auction</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="watchlist.php">WatchList</a>
+          </li>
           <?php endif; ?>
         </ul>
         <ul class="navbar-nav">
@@ -60,9 +61,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
               <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
                 <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="logout.php">Logout</a></li>
               <?php else: ?>
                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
@@ -70,37 +69,10 @@
               <?php endif; ?>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="watchlist.php">WatchList</a>
-          </li>
-        <?php endif; ?>
-      </ul>
-      <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-user-circle"></i> 
-            <?php 
-            if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-              echo 'Hello ' . htmlspecialchars($_SESSION['username']) . '!';
-            } else {
-              echo 'Please login';
-            }
-            ?>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
-              <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-            <?php else: ?>
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
-              <li><a class="dropdown-item" href="register.php">Register</a></li>
-            <?php endif; ?>
-          </ul>
-        </li>
       </ul>
     </div>
-  </nav>
+  </div>
+</nav>
 
   <?php
   if (isset($_SESSION['error'])) {
@@ -349,8 +321,7 @@
         <?php foreach ($auctions as $auction): ?>
           <div class="col" data-aos="fade-up">
             <div class="card auction-card h-100 shadow-sm hover-effect">
-              <!--!!!!!!!!!! 要改为fixed_lisitng.php ----!!!!!!!!!!!!!!!!!-->
-              <a href="fixed_listing.php?auction_id=<?php echo $auction['auction_id']; ?>" class="text-decoration-none">
+              <a href="listing.php?auction_id=<?php echo $auction['auction_id']; ?>" class="text-decoration-none">
                 <?php if (!empty($auction['image_url'])): ?>
                   <div class="card-img-top-wrapper">
                     <img src="<?php echo htmlspecialchars($auction['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($auction['item_name']); ?>">
@@ -469,5 +440,4 @@
   </script>
 
 </body>
-
 </html>

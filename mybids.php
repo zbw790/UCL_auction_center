@@ -44,8 +44,7 @@ $query = "SELECT a.auction_id,
                         Current Price: $<?php echo number_format($auction['current_price'], 2); ?><br>
                         Bids: <?php echo $auction['num_bids']; ?><br>
                         Ends: <?php echo (new DateTime($auction['end_date']))->format('M d, Y H:i'); ?><br>
-                        <!-- 这里改动了调用listing.php文件的名字！！！！-->
-                        <a href="fixed_listing.php?auction_id=<?php echo $auction['auction_id']; ?>">View Details</a>
+                        <a href="listing.php?auction_id=<?php echo $auction['auction_id']; ?>">View Details</a>
                     </li>
                 <?php endforeach; ?>
             </ul>
