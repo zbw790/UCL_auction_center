@@ -102,11 +102,19 @@ if (isset($_GET['delete_id'])) {
                     <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
                 </td>";
             } elseif ($status == 'cancelled') {
-                // If auction is cancelled, allow delete and view regardless of bid count
-                echo "<td>
-                    <a href='mylistings.php?delete_id=$auction_id' onclick='return deleteconfirm()' class='btn btn-danger custom-btn'>Delete</a> <br>
-                    <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
-                </td>";
+                // If auction is cancelled
+                if ($bidCount == 0) {
+                    // If no bids, allow delete and view
+                    echo "<td>
+                        <a href='mylistings.php?delete_id=$auction_id' onclick='return deleteconfirm()' class='btn btn-danger custom-btn'>Delete</a> <br>
+                        <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                    </td>";
+                } else {
+                    // If there are bids, only allow view
+                    echo "<td>
+                        <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                    </td>";
+                }
             }
         }
         ?>
