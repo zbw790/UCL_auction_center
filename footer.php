@@ -15,7 +15,7 @@
       <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
         <h5 class="text-uppercase">About Us</h5>
         <p>
-          We are group 40 and UCL is the best!!!!.
+          We are Group 40 and UCL is the best!!!.
         </p>
       </div>
       <div class="col-lg-3 col-md-6 mb-4 mb-md-0">

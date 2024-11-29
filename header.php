@@ -36,16 +36,21 @@ if (!isset($_SESSION['logged_in'])) {
         </li>
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true): ?>
           <li class="nav-item">
+            <a class="nav-link" href="create_auction.php">Create Auction</a>
+          </li>
+
+          <li class="nav-item">
             <a class="nav-link" href="mybids.php">My Bids</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="mylistings.php">My Listings</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="create_auction.php">Create Auction</a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="watchlist.php">WatchList</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="recommendations.php">Recommendation</a>
           </li>
         <?php endif; ?>
       </ul>

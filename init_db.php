@@ -184,11 +184,11 @@ try {
     (5, 1, 'Smartphone', 'Latest model smartphone', '2024-11-28 09:00:00', '2024-12-28 09:00:00', 500.00, 700.00, 500.00, './images/9.jpg', 'active'),
     (6, 2, 'Leather Jacket', 'Vintage leather jacket', '2024-12-01 11:00:00', '2024-12-31 11:00:00', 200.00, 300.00, 200.00, './images/10.jpg', 'active'),
     (7, 3, 'Gardening Tools Set', 'Complete set of gardening tools', '2024-10-01 13:00:00', '2024-11-01 13:00:00', 150.00, 250.00, 150.00, './images/11.jpg', 'ended'),
-    (8, 4, 'Tennis Racket', 'Professional tennis racket', '2024-11-05 15:00:00', '2024-12-05 15:00:00', 100.00, 150.00, 100.00, './images/1.jpg', 'active'),
-    (5, 5, 'Antique Clock', 'Rare antique clock from the 18th century', '2024-11-10 10:00:00', '2024-12-10 10:00:00', 2000.00, 3000.00, 2000.00, './images/2.jpg', 'active'),
-    (6, 6, 'Electric Scooter', 'Foldable electric scooter', '2024-11-15 12:00:00', '2024-12-15 12:00:00', 300.00, 400.00, 300.00, './images/3.jpg', 'active'),
-    (7, 7, 'Board Game Collection', 'Collection of popular board games', '2024-11-20 14:00:00', '2024-12-20 14:00:00', 100.00, 150.00, 100.00, './images/4.jpg', 'active'),
-    (8, 1, 'Digital Camera', 'High-end digital camera with accessories', '2024-11-25 16:00:00', '2024-12-25 16:00:00', 600.00, 800.00, 600.00, './images/5.jpg', 'active')
+    (8, 4, 'Tennis Racket', 'Professional tennis racket', '2024-11-05 15:00:00', '2024-12-05 15:00:00', 100.00, 150.00, 100.00, './images/12.jpg', 'active'),
+    (5, 5, 'Antique Clock', 'Rare antique clock from the 18th century', '2024-11-10 10:00:00', '2024-12-10 10:00:00', 2000.00, 3000.00, 2000.00, './images/13.jpg', 'active'),
+    (6, 6, 'Electric Scooter', 'Foldable electric scooter', '2024-11-15 12:00:00', '2024-12-15 12:00:00', 300.00, 400.00, 300.00, './images/14.jpg', 'active'),
+    (7, 7, 'Board Game Collection', 'Collection of popular board games', '2024-11-20 14:00:00', '2024-12-20 14:00:00', 100.00, 150.00, 100.00, './images/15.jpg', 'active'),
+    (8, 1, 'Digital Camera', 'High-end digital camera with accessories', '2024-11-25 16:00:00', '2024-12-25 16:00:00', 600.00, 800.00, 600.00, './images/16.jpg', 'active')
     ");
 
     // Insert sample bids with realistic bid progression

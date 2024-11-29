@@ -1,6 +1,7 @@
 <?php include_once("header.php")?>
 <?php require("utilities.php")?>
 <?php require("db_connect.php")?>
+
 <?php 
 // Creator can delete the auction if the auction exists
 if (isset($_GET['delete_id'])) {

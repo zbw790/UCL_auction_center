@@ -27,12 +27,15 @@ if (isset($_POST['submit'])) {
         }
 
         if (isset($_POST['edit_id']) && !empty($_POST['edit_id'])) {
-            // 编辑模式：不修改 start_date 和 end_date，只验证其正确性
-            // 从数据库获取原始的 start_date 和 end_date
+            // Edit mode: Do not modify start_date and end_date, only validate their correctness
+            // Retrieve the original start_date and end_date from the database
+
             $start_date = new DateTime($auction['start_date']);  
             $end_date = new DateTime($auction['end_date']);  
-            // 提交时，用户不能修改这两个时间，因此直接跳过 start_date 和 end_date 的验证
-            // 但是仍然需要验证 end_date 是否大于 start_date
+
+            // On submission, the user cannot modify these two dates, so skip the validation for start_date and end_date
+            // However, it is still necessary to validate that end_date is greater than start_date
+
             if (isset($_POST['end_date']) && !empty($_POST['end_date'])) {
                 $new_end_date = new DateTime($_POST['end_date']);
                 if ($new_end_date <= $start_date) {
@@ -42,7 +45,7 @@ if (isset($_POST['submit'])) {
             }
 
         } else {
-            // 创建模式：验证 start_date 和 end_date
+            // Create mode: Validate start_date and end_date
             $start_date = new DateTime($_POST['start_date']);
             $end_date = new DateTime($_POST['end_date']);
             $now = new DateTime();
