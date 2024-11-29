@@ -142,7 +142,7 @@ $category = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-    //-----------！！！不能改！！！！---------//
+    //-----------！！！DO NOT CHANGE！！！！---------//
     // JavaScript to add further validation for end date
     document.getElementById('auctionStartDate').addEventListener('change', function() {
         const startDate = new Date(this.value);
