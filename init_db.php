@@ -102,20 +102,6 @@ try {
     ");
     echo "Auction transaction table created or already exists.\n";
 
-    // Check and create watchlist table
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS watchlist (
-            watchlist_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            user_id INT UNSIGNED NOT NULL,
-            auction_id INT UNSIGNED NOT NULL,
-            added_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES user(user_id),
-            FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
-            UNIQUE KEY unique_watch (user_id, auction_id)
-        )
-    ");
-    echo "Watchlist table created or already exists.\n";
-
     // Insert sample data into category table
     $pdo->exec("
         INSERT IGNORE INTO category (category_name) VALUES 
@@ -148,7 +134,19 @@ try {
     (1, 5, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', '2024-11-01 12:00:00', '2024-11-15 12:00:00', 100.00, 200.00, 100.00, './images/1.jpg', 'active'),
     (2, 1, 'Gaming Laptop', 'High-performance gaming laptop', '2024-11-05 10:00:00', '2024-12-05 10:00:00', 800.00, 1000.00, 800.00, './images/2.jpg', 'active'),
     (3, 5, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', '2024-11-08 14:00:00', '2024-12-08 14:00:00', 5000.00, 8000.00, 5000.00, './images/3.jpg', 'active'),
-    (4, 4, 'Mountain Bike', 'Professional mountain bike, barely used', '2024-11-10 09:00:00', '2024-12-10 09:00:00', 300.00, 500.00, 300.00, './images/4.jpg', 'active')
+    (4, 4, 'Mountain Bike', 'Professional mountain bike, barely used', '2024-11-10 09:00:00', '2024-12-10 09:00:00', 300.00, 500.00, 300.00, './images/4.jpg', 'active'),
+    (1, 2, 'Designer Handbag', 'Limited edition designer handbag', '2024-11-15 11:00:00', '2024-12-15 11:00:00', 1000.00, 1500.00, 1000.00, './images/5.jpg', 'active'),
+    (2, 3, 'Smart Home Kit', 'Complete smart home automation kit', '2024-11-18 13:00:00', '2024-12-18 13:00:00', 200.00, 300.00, 200.00, './images/6.jpg', 'active'),
+    (3, 6, 'Classic Car', 'Restored classic car from the 1970s', '2024-11-20 15:00:00', '2024-12-20 15:00:00', 15000.00, 20000.00, 15000.00, './images/7.jpg', 'active'),
+    (4, 5, 'Rare Comic Book', 'First edition rare comic book', '2024-11-25 10:00:00', '2024-12-25 10:00:00', 500.00, 1000.00, 500.00, './images/8.jpg', 'active'),
+    (5, 1, 'Smartphone', 'Latest model smartphone', '2024-11-28 09:00:00', '2024-12-28 09:00:00', 500.00, 700.00, 500.00, './images/9.jpg', 'active'),
+    (6, 2, 'Leather Jacket', 'Vintage leather jacket', '2024-12-01 11:00:00', '2024-12-31 11:00:00', 200.00, 300.00, 200.00, './images/10.jpg', 'active'),
+    (7, 3, 'Gardening Tools Set', 'Complete set of gardening tools', '2024-10-01 13:00:00', '2024-11-01 13:00:00', 150.00, 250.00, 150.00, './images/11.jpg', 'ended'),
+    (8, 4, 'Tennis Racket', 'Professional tennis racket', '2024-11-05 15:00:00', '2024-12-05 15:00:00', 100.00, 150.00, 100.00, './images/12.jpg', 'active'),
+    (5, 5, 'Antique Clock', 'Rare antique clock from the 18th century', '2024-11-10 10:00:00', '2024-12-10 10:00:00', 2000.00, 3000.00, 2000.00, './images/13.jpg', 'active'),
+    (6, 6, 'Electric Scooter', 'Foldable electric scooter', '2024-11-15 12:00:00', '2024-12-15 12:00:00', 300.00, 400.00, 300.00, './images/14.jpg', 'active'),
+    (7, 7, 'Board Game Collection', 'Collection of popular board games', '2024-11-20 14:00:00', '2024-12-20 14:00:00', 100.00, 150.00, 100.00, './images/15.jpg', 'active'),
+    (8, 1, 'Digital Camera', 'High-end digital camera with accessories', '2024-11-25 16:00:00', '2024-12-25 16:00:00', 600.00, 800.00, 600.00, './images/16.jpg', 'active')
     ");
 
     // Insert sample bids
@@ -156,14 +154,41 @@ try {
     INSERT IGNORE INTO bid (auction_id, user_id, bid_amount, bid_date) VALUES
     (1, 2, 150.00, '2024-09-25 14:30:00'),
     (1, 3, 180.00, '2024-10-05 16:45:00'),
+    (1, 4, 200.00, '2024-10-06 12:30:00'),
     (2, 3, 900.00, '2024-09-30 11:15:00'),
-    (2, 4, 950.00, '2024-10-10 13:20:00')
+    (2, 4, 950.00, '2024-10-10 13:20:00'),
+    (2, 5, 1000.00, '2024-10-11 09:45:00'),
+    (3, 2, 6000.00, '2024-09-25 10:00:00'),
+    (3, 4, 7500.00, '2024-10-05 17:30:00'),
+    (3, 6, 8000.00, '2024-10-06 14:15:00'),
+    (4, 1, 400.00, '2024-10-05 09:45:00'),
+    (4, 2, 450.00, '2024-10-12 14:10:00'),
+    (4, 3, 500.00, '2024-10-13 16:20:00'),
+    (5, 2, 1100.00, '2024-10-10 12:30:00'),
+    (5, 3, 1200.00, '2024-10-20 15:40:00'),
+    (5, 4, 1300.00, '2024-10-21 11:25:00'),
+    (6, 4, 250.00, '2024-10-15 16:20:00'),
+    (6, 5, 275.00, '2024-10-16 13:45:00'),
+    (6, 6, 300.00, '2024-10-17 10:30:00'),
+    (7, 1, 16000.00, '2024-10-20 11:50:00'),
+    (7, 4, 18000.00, '2024-11-01 13:15:00'),
+    (7, 5, 19000.00, '2024-11-02 15:40:00'),
+    (8, 3, 800.00, '2024-10-25 10:05:00'),
+    (8, 5, 900.00, '2024-10-26 14:30:00'),
+    (8, 6, 950.00, '2024-10-27 16:15:00'),
+    (9, 6, 600.00, '2024-11-01 11:30:00'),
+    (9, 7, 650.00, '2024-11-10 14:45:00'),
+    (9, 8, 700.00, '2024-11-11 09:20:00'),
+    (10, 7, 250.00, '2024-11-05 13:20:00'),
+    (10, 8, 280.00, '2024-11-15 16:10:00'),
+    (10, 1, 300.00, '2024-11-16 10:45:00')
     ");
 
     // Insert sample transactions
     $pdo->exec("
     INSERT IGNORE INTO auction_transaction (auction_id, buyer_id, transaction_amount, transaction_date) VALUES
-    (1, 3, 180.00, '2024-10-06 13:01:00')
+    (11, 1, 200.00, '2024-10-05 13:01:00'),
+    (3, 6, 8000.00, '2024-10-10 14:01:00')
     ");
 
     // Create trigger for updating highest bid
