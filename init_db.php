@@ -102,6 +102,20 @@ try {
     ");
     echo "Auction transaction table created or already exists.\n";
 
+    // Check and create watchlist table
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS watchlist (
+            watchlist_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            user_id INT UNSIGNED NOT NULL,
+            auction_id INT UNSIGNED NOT NULL,
+            added_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES user(user_id),
+            FOREIGN KEY (auction_id) REFERENCES auction(auction_id),
+            UNIQUE KEY unique_watch (user_id, auction_id)
+        )
+    ");
+    echo "Watchlist table created or already exists.\n";
+
     // Insert sample data into category table
     $pdo->exec("
         INSERT IGNORE INTO category (category_name) VALUES 
@@ -114,6 +128,21 @@ try {
         ('Toys & Hobbies')
     ");
     echo "Sample categories inserted or already exist.\n";
+
+    // Insert sample watchlist data
+    $pdo->exec("
+    INSERT IGNORE INTO watchlist (user_id, auction_id, added_date) VALUES
+    (1, 2, '2024-10-01 09:00:00'),
+    (1, 3, '2024-10-02 10:30:00'),
+    (2, 1, '2024-10-03 14:15:00'),
+    (2, 4, '2024-10-04 16:45:00'),
+    (3, 5, '2024-10-05 11:20:00'),
+    (3, 6, '2024-10-06 13:30:00'),
+    (4, 7, '2024-10-07 15:45:00'),
+    (4, 8, '2024-10-08 09:15:00'),
+    (5, 9, '2024-10-09 12:00:00'),
+    (5, 10, '2024-10-10 14:30:00')
+    ");
 
     // Insert sample users
     $pdo->exec("
