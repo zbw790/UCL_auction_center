@@ -65,27 +65,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
         $mail->Port = 587; 
 
-        // 发件人信息
+        
         $mail->setFrom('lucy.yang.test@gmail.com', 'Auction Site');
         $mail->addAddress($email, $username); 
 
-        // 邮件内容
+        
         $mail->isHTML(true);
         $mail->Subject = 'Welcome to Auction Site!';
         $mail->Body = "
             <h1>Hi $username,</h1>
             <p>Thank you for registering at Auction Site.</p>
             <p>We're thrilled to have you on board. Start exploring our platform today and make the most of our auctions!</p>
-            <p><a href= 'browse.php' >Visit Auction Site</a></p>
+            <p><a href=\"http://localhost/UCL_auction_center/browse.php\">Visit Auction Site</a></p>
             <br>
             <p>Best regards,<br>The Auction Site Team</p>
         ";
 
-        // 发送邮件
+        
         $mail->send();
         $_SESSION['message'] .= " Welcome to our auction site!";
     } catch (Exception $e) {
-        // 邮件发送失败时，不中断注册流程，只记录消息
         $_SESSION['message'] .= " However, we couldn't send a welcome email. Error: " . $mail->ErrorInfo;
     }
 

@@ -98,7 +98,7 @@ try {
                     <h1>Hi $username,</h1>
                     <p>Your bid on <strong>$item_name</strong> has been outbid.</p>
                     <p>The new highest bid is: <strong>\$$new_price</strong></p>
-                    <p>You can place a new bid to stay in the race. <a href='https://example.com/listing.php?auction_id=$auction_id'>View Auction</a></p>
+                    <p>You can place a new bid to stay in the race. <a href='http://localhost/UCL_auction_center/listing.php?auction_id=$auction_id'>View Auction</a></p>
                     <br>
                     <p>Best regards,<br>The Auction Site Team</p>
                 ";

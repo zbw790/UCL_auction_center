@@ -2,13 +2,12 @@
 require_once('init.php');
 require_once('utilities.php');
 
-// 验证用户是否登录
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     echo json_encode(['success' => false, 'message' => 'User not logged in']);
     exit();
 }
 
-// 获取拍卖ID
+// Retrieve the auction ID
 $auction_id = $_POST['auction_id'] ?? null;
 
 if (!$auction_id) {
@@ -17,7 +16,7 @@ if (!$auction_id) {
 }
 
 try {
-    // 获取拍卖详情
+    // Retrieve the auction details
     $stmt = $pdo->prepare("SELECT * FROM auction WHERE auction_id = ?");
     $stmt->execute([$auction_id]);
     $auction = $stmt->fetch();
@@ -27,29 +26,29 @@ try {
         exit();
     }
 
-    // 获取当前时间和拍卖时间
+    // Retrieve the current time and the auction time
     $now = new DateTime();
     $start_date = new DateTime($auction['start_date']);
     $end_date = new DateTime($auction['end_date']);
 
     
     if ($now >= $end_date && $auction['status'] == 'active') {
-        // 先将拍卖状态更新为 ended
+        // First, update the auction status to 'ended'
         $stmt = $pdo->prepare("UPDATE auction SET status = 'ended' WHERE auction_id = ?");
         $stmt->execute([$auction_id]);
 
-        // 获取当前出价信息
+        // Retrieve the current bid information
         $stmt = $pdo->prepare("SELECT COUNT(*) AS bid_count, COALESCE(MAX(bid_amount), 0) AS highest_bid FROM bid WHERE auction_id = ?");
         $stmt->execute([$auction_id]);
         $bid_info = $stmt->fetch();
 
-        // 如果没有出价，更新状态为 cancelled
+        // If there are no bids, update the status to 'cancelled'
         if ($bid_info['bid_count'] == 0) {
             $stmt = $pdo->prepare("UPDATE auction SET status = 'cancelled' WHERE auction_id = ?");
             $stmt->execute([$auction_id]);
             echo json_encode(['success' => true, 'message' => 'Auction ended with no bids. Status set to cancelled.']);
         } else {
-            // 如果有出价，生成交易
+            // If there are bids, generate a transaction
             $highest_bid = $bid_info['highest_bid'];
             if ($highest_bid >= $auction['reserve_price']) {
                 $stmt = $pdo->prepare("SELECT user_id FROM bid WHERE auction_id = ? AND bid_amount = ? LIMIT 1");
@@ -62,7 +61,7 @@ try {
                     echo json_encode(['success' => true, 'message' => 'Auction ended successfully. Transaction created for highest bid.']);
                 }
             } else {
-                // 如果最高出价低于保留价，更新状态为 cancelled
+                // If the highest bid is lower than the reserve price, update the status to 'cancelled'
                 $stmt = $pdo->prepare("UPDATE auction SET status = 'cancelled' WHERE auction_id = ?");
                 $stmt->execute([$auction_id]);
                 echo json_encode(['success' => true, 'message' => 'Highest bid did not meet reserve price. Auction cancelled.']);

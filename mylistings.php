@@ -1,6 +1,7 @@
 <?php include_once("header.php")?>
 <?php require("utilities.php")?>
 <?php require("db_connect.php")?>
+
 <?php 
 // Creator can delete the auction if the auction exists
 if (isset($_GET['delete_id'])) {
@@ -26,19 +27,18 @@ if (isset($_GET['delete_id'])) {
   <h2 class="my-3">My listings</h2>
   
   <div class="checkout-left">  
-
-    <div class="col-md-12 ">
-      <table id="datatable"  class="table table-striped table-bordered dataTable" role="grid" aria-describedby="example_info" >            
+     <div class="col-md-12 ">
+      <table id="datatable" class="table table-striped table-bordered dataTable" role="grid" aria-describedby="example_info">            
         <thead>
           <tr>  
             <th style="width:175px;">Item Name</th>
-            <th>category</th>        
+            <th>Category</th>        
             <th>Bids</th>
             <th>Last Bid</th>
             <th>Auction Period</th>
             <th>Reserve Price</th>
+            <th>Status</th>
             <th>Action</th>
-
           </tr>
         </thead>
         <tbody>
@@ -72,18 +72,48 @@ if (isset($_GET['delete_id'])) {
             } else {
                echo "<td>".htmlspecialchars($rows['starting_price'])."</td>";
             }
+          
+            // Display auction period (start date and end date)
             echo "<td>". date("d/m/Y h:i A",strtotime($rows['start_date'])) . " -".  date("d/m/Y h:i A",strtotime($rows['end_date'])) . "</td>";
             echo "<td>".htmlspecialchars($rows['reserve_price'])."</td>";
-            if ($bidCount > 0) {
-              echo "<td><a href='listing.php?auction_id=$rows[auction_id]' target='_blank' class='btn btn-info custom-btn' >View</a></td>";
-          } else {
-              echo "<td>
-                  <a href='create_auction.php?edit_id=$rows[auction_id]' class='btn btn-warning custom-btn'>Edit</a> <br>
-                  <a href='mylistings.php?delete_id=$rows[auction_id]' onclick='return deleteconfirm()' class='btn btn-danger custom-btn'>Delete</a> <br>
-                  <a href='listing.php?auction_id=$rows[auction_id]' target='_blank' class='btn btn-info custom-btn' >View</a>
-              </td>";
-          }
-           
+            echo "<td>".htmlspecialchars($rows['status'])."</td>";
+
+            // Determine actions based on auction status and bid count
+            $status = $rows['status'];
+            $auction_id = $rows['auction_id'];
+            
+            if ($status == 'active' && $bidCount == 0) {
+                // If status is 'active' and no bids, allow edit and delete
+                echo "<td>
+                    <a href='create_auction.php?edit_id=$auction_id' class='btn btn-warning custom-btn'>Edit</a> <br>
+                    <a href='mylistings.php?delete_id=$auction_id' onclick='return deleteconfirm()' class='btn btn-danger custom-btn'>Delete</a> <br>
+                    <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                </td>";
+            } elseif ($status == 'active' && $bidCount > 0) {
+                // If status is 'active' and there are bids, only allow view
+                echo "<td>
+                    <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                </td>";
+            } elseif ($status == 'ended') {
+                // If auction has ended, only allow view
+                echo "<td>
+                    <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                </td>";
+            } elseif ($status == 'cancelled') {
+                // If auction is cancelled
+                if ($bidCount == 0) {
+                    // If no bids, allow delete and view
+                    echo "<td>
+                        <a href='mylistings.php?delete_id=$auction_id' onclick='return deleteconfirm()' class='btn btn-danger custom-btn'>Delete</a> <br>
+                        <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                    </td>";
+                } else {
+                    // If there are bids, only allow view
+                    echo "<td>
+                        <a href='listing.php?auction_id=$auction_id' target='_blank' class='btn btn-info custom-btn'>View</a>
+                    </td>";
+                }
+            }
         }
         ?>
 
