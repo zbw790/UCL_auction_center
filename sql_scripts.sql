@@ -70,31 +70,6 @@ CREATE TABLE auction_transaction (
     FOREIGN KEY (buyer_id) REFERENCES user(user_id)
 );
 
--- Private Message table
-CREATE TABLE private_message (
-    message_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    sender_id INT UNSIGNED NOT NULL,
-    receiver_id INT UNSIGNED NOT NULL,
-    message_content TEXT NOT NULL,
-    sent_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES user(user_id),
-    FOREIGN KEY (receiver_id) REFERENCES user(user_id),
-    INDEX idx_sender (sender_id),
-    INDEX idx_receiver (receiver_id),
-    INDEX idx_sent_date (sent_date)
-);
-
--- Rating table
-CREATE TABLE rating (
-    rating_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    transaction_id INT UNSIGNED NOT NULL UNIQUE,
-    rating_score INT NOT NULL,
-    rating_comment TEXT,
-    rating_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (transaction_id) REFERENCES auction_transaction(transaction_id),
-    CHECK (rating_score >= 1 AND rating_score <= 5)
-);
-
 -- Insert sample categories
 INSERT INTO category (category_name) VALUES 
 ('Electronics'),
@@ -110,29 +85,21 @@ INSERT INTO user (username, email, password, registration_date) VALUES
 ('john_doe', 'john@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-01 10:00:00'),
 ('jane_smith', 'jane@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-02 11:30:00'),
 ('mike_wilson', 'mike@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-03 14:45:00'),
-('sarah_brown', 'sarah@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-04 09:15:00'),
-('alex_johnson', 'alex@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-05 16:20:00'),
-('emily_davis', 'emily@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-06 13:10:00'),
-('chris_lee', 'chris@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-07 11:45:00'),
-('lisa_wang', 'lisa@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-08 15:30:00');
+('sarah_brown', 'sarah@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2024-09-04 09:15:00');
 
 -- Insert auctions first without highest_bid_id
 INSERT INTO auction (seller_id, item_name, description, category_id, start_date, end_date, starting_price, reserve_price, highest_bid, image_url, status) VALUES
 (1, 'Vintage Watch', 'A beautiful vintage watch from the 1960s', 5, '2024-09-10 12:00:00', '2024-10-20 12:00:00', 100.00, 200.00, 180.00, './images/1.jpg', 'active'),
 (2, 'Gaming Laptop', 'High-performance gaming laptop', 1, '2024-09-15 10:00:00', '2024-10-25 10:00:00', 800.00, 1000.00, 950.00, './images/2.jpg', 'active'),
 (3, 'Antique Vase', 'Rare antique vase from the Ming Dynasty', 5, '2024-09-20 14:00:00', '2024-10-10 14:00:00', 5000.00, 8000.00, 7500.00, './images/3.jpg', 'ended'),
-(4, 'Mountain Bike', 'Professional mountain bike, barely used', 4, '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 450.00, './images/4.jpg', 'active'),
-(1, 'Designer Handbag', 'Limited edition designer handbag', 2, '2024-09-30 11:00:00', '2024-11-05 11:00:00', 1000.00, 1500.00, 1200.00, './images/5.jpg', 'active'),
-(2, 'Smart Home Kit', 'Complete smart home automation kit', 3, '2024-10-05 13:00:00', '2024-11-10 13:00:00', 200.00, 300.00, 250.00, './images/6.jpg', 'active');
+(4, 'Mountain Bike', 'Professional mountain bike, barely used', 4, '2024-09-25 09:00:00', '2024-10-30 09:00:00', 300.00, 500.00, 450.00, './images/4.jpg', 'active');
 
 -- Insert bids
 INSERT INTO bid (auction_id, user_id, bid_amount, bid_date) VALUES
 (1, 2, 150.00, '2024-09-25 14:30:00'),
 (1, 3, 180.00, '2024-10-05 16:45:00'),
 (2, 3, 900.00, '2024-09-30 11:15:00'),
-(2, 4, 950.00, '2024-10-10 13:20:00'),
-(3, 2, 6000.00, '2024-09-25 10:00:00'),
-(3, 4, 7500.00, '2024-10-05 17:30:00');
+(2, 4, 950.00, '2024-10-10 13:20:00');
 
 -- Update auctions with highest_bid_id
 UPDATE auction a
@@ -143,15 +110,6 @@ WHERE b.bid_amount = a.highest_bid;
 -- Insert transactions
 INSERT INTO auction_transaction (auction_id, buyer_id, transaction_amount, transaction_date) VALUES
 (3, 4, 7500.00, '2024-10-10 14:01:00');
-
--- Insert ratings
-INSERT INTO rating (transaction_id, rating_score, rating_comment, rating_date) VALUES
-(1, 5, 'Great transaction!', '2024-10-11 10:00:00');
-
--- Insert private messages
-INSERT INTO private_message (sender_id, receiver_id, message_content, sent_date) VALUES
-(1, 2, 'Is this item still available?', '2024-10-01 09:30:00'),
-(2, 1, 'Yes, it is!', '2024-10-01 10:15:00');
 
 -- Create trigger for updating highest bid
 DELIMITER //

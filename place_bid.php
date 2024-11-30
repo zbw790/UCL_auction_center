@@ -25,10 +25,8 @@ $bid_amount = (float)$_POST['bid_amount'];
 $user_id = $_SESSION['user_id'];
 
 try {
-    // Start transaction
     $pdo->beginTransaction();
 
-    // Get current auction info and previous highest bidder
     $stmt = $pdo->prepare("
         SELECT 
             COALESCE(MAX(b.bid_amount), a.starting_price) AS current_price,
@@ -63,7 +61,6 @@ try {
         throw new Exception('Bid must be higher than current price');
     }
 
-    // Notify the previous highest bidder
     if ($auction['highest_bidder_id'] && $auction['highest_bidder_id'] != $user_id) {
         $stmt = $pdo->prepare("
             SELECT email, username 
@@ -79,7 +76,6 @@ try {
             $item_name = $auction['item_name'] ?? 'the auction item';
             $new_price = number_format($bid_amount, 2);
 
-            // Send email using PHPMailer
             try {
                 $mail = new PHPMailer(true);
                 $mail->isSMTP();
@@ -105,20 +101,17 @@ try {
 
                 $mail->send();
             } catch (Exception $e) {
-                // Log error if email fails (do not interrupt the bid process)
                 error_log("Email to $email failed: " . $mail->ErrorInfo);
             }
         }
     }
 
-    // Place new bid
     $stmt = $pdo->prepare("
         INSERT INTO bid (auction_id, user_id, bid_amount)
         VALUES (?, ?, ?)
     ");
     $stmt->execute([$auction_id, $user_id, $bid_amount]);
 
-    // Update auction current price and highest bidder
     $stmt = $pdo->prepare("
         UPDATE auction
         SET current_price = ?, highest_bidder_id = ?
