@@ -8,9 +8,11 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+
 $auction_id = $_GET['auction_id'];
 
 try {
+    // get auction information
     $stmt = $pdo->prepare("SELECT * FROM auction WHERE auction_id = ?");
     $stmt->execute([$auction_id]);
     $auction = $stmt->fetch();
@@ -20,6 +22,7 @@ try {
         exit();
     }
 
+    // validate identification
     if ($_SESSION['user_id'] !== $auction['seller_id']) {
         echo "<div class='alert alert-danger'>You do not have permission to manage this auction.</div>";
         exit();
@@ -32,6 +35,7 @@ try {
     $start_date = new DateTime($auction['start_date']);
     $end_date = new DateTime($auction['end_date']);
 
+    
     $is_seller = ($_SESSION['user_id'] == $auction['seller_id']);
     if ($is_seller && $auction['status'] == 'active' && $start_date < $end_date) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_auction'])) {
