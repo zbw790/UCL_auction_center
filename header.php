@@ -52,6 +52,9 @@ if (!isset($_SESSION['logged_in'])) {
           <li class="nav-item">
             <a class="nav-link" href="recommendations.php">Recommendation</a>
           </li>
+          <li class="nav-item mx-1">
+            <a class="nav-link" href="my_transactions.php">My Transactions</a>
+          </li>
         <?php endif; ?>
       </ul>
       <ul class="navbar-nav">
