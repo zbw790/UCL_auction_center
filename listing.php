@@ -41,6 +41,9 @@
             <li class="nav-item">
               <a class="nav-link" href="mylistings.php">My Listings</a>
             </li>
+            <li class="nav-item mx-1">
+            <a class="nav-link" href="my_transactions.php">My Transactions</a>
+          </li>
 
           <?php endif; ?>
         </ul>
