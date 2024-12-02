@@ -342,41 +342,35 @@
     // Update price every 5 seconds
     setInterval(updatePriceAndBids, 1000); //every 1 second
 
-    // 更新服务器时间的函数
     function fetchServerTime() {
       return $.ajax({
-        url: 'server_time.php', // 这个 PHP 文件返回当前服务器时间
+        url: 'server_time.php', 
         type: 'GET',
         dataType: 'json'
       });
     }
 
     // Update time remaining every second
-    // 更新剩余时间的函数
     function updateTimeRemaining() {
-      // 通过 AJAX 获取服务器时间
       fetchServerTime().done(function(response) {
         if (response.success) {
-          // 使用服务器时间计算剩余时间
           const serverTime = new Date(response.server_time);
           const startDate = new Date('<?php echo $auction['start_date']; ?>');
           const endDate = new Date('<?php echo $auction['end_date']; ?>');
 
-          // 如果拍卖还未开始，显示拍卖未开始的信息
           if (serverTime < startDate) {
             $('#time-remaining').closest('.countdown-timer').parent().html(
               '<div class="alert alert-secondary">This auction has not started yet</div>'
             );
-            $('#bid-form').remove(); // 禁用竞标表单
+            $('#bid-form').remove(); 
             return;
           }
 
           const diff = endDate - serverTime;
 
-          // 如果倒计时结束，通知服务器更新拍卖状态
           if (diff <= 0) {
             $.ajax({
-              url: 'update_auction_status.php', // 新增的后端接口，用于处理拍卖结束状态
+              url: 'update_auction_status.php', 
               type: 'POST',
               data: {
                 auction_id: <?php echo $auction_id; ?>
@@ -386,34 +380,30 @@
                   $('#time-remaining').closest('.countdown-timer').parent().html(
                     '<div class="alert alert-secondary">This auction has ended</div>'
                   );
-                  $('#bid-form').remove(); // 禁用竞标表单
+                  $('#bid-form').remove(); 
                 }
               }
             });
             return;
           }
 
-          // 更精确地计算剩余时间
           const totalSeconds = Math.floor(diff / 1000);
           const days = Math.floor(totalSeconds / (60 * 60 * 24));
           const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
           const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
           const seconds = totalSeconds % 60;
 
-          // 更新倒计时显示
           $('#time-remaining').text(
             `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`
           );
 
-          // 如果倒计时低于10秒，增加刷新频率
           if (totalSeconds <= 10) {
             clearInterval(updateInterval);
-            updateInterval = setInterval(updateTimeRemaining, 200); // 每 200 毫秒更新一次
+            updateInterval = setInterval(updateTimeRemaining, 200); 
           }
 
-          // 如果倒计时结束，禁用竞标按钮（双重保险）
           if (serverTime >= endDate) {
-            $('#bid-form').remove(); // 移除竞标表单
+            $('#bid-form').remove();
             $('#time-remaining').closest('.countdown-timer').parent().html(
               '<div class="alert alert-secondary">This auction has ended</div>'
             );
